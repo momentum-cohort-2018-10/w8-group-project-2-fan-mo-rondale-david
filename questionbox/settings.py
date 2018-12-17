@@ -26,7 +26,7 @@ SECRET_KEY = '73=bk=^!bhkjd5$qv#76w20y(xfxwe$@2(!!2hui+6(c_it8^c'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = 'questions.User'
 
 # Application definition
 
