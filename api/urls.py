@@ -25,6 +25,6 @@ urlpatterns = [
          api_views.AnswerListView.as_view(),
          name='answer-list'),
     path('answers/<pk>',
-         api_views.AnswerListView.as_view(),
+         api_views.AnswerDetailView.as_view(),
          name='answer-detail'),
 ]
