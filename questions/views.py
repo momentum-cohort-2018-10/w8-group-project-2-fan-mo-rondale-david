@@ -9,7 +9,7 @@ from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from questions.permissions import IsAuthorOrReadOnly
+from questions.permissions import IsAuthorOrReadOnly, IsStarOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
@@ -39,6 +39,7 @@ class UserDetailView(generics.RetrieveAPIView):
 class StarredItemList(generics.ListCreateAPIView):
     queryset = StarredItem.objects.all()
     serializer_class = StarredItemSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -47,6 +48,7 @@ class StarredItemList(generics.ListCreateAPIView):
 class StarredItemDetail(generics.RetrieveDestroyAPIView):
     queryset = StarredItem.objects.all()
     serializer_class = StarredItemSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, IsStarOwnerOrReadOnly)
 
 
 class QuestionListView(generics.ListCreateAPIView):
