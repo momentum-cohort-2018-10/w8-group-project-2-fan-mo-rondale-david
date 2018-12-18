@@ -33,7 +33,6 @@ class StarredItemSerializer(serializers.ModelSerializer):
             Q(model="question") | Q(model="answer")))
 
     star_link = serializers.HyperlinkedIdentityField(view_name='star-detail')
-    # content_object = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = StarredItem
