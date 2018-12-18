@@ -18,4 +18,5 @@ urlpatterns = [
     path('questions/<pk>',
          api_views.QuestionDetailView.as_view(),
          name='question-detail'),
+    path('api-auth/', include('rest_framework.urls')),
 ]
