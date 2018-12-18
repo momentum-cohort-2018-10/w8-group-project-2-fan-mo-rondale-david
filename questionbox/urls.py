@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from questions import views
+from api import views as api_views
 
 urlpatterns = [
     path('', views.index, name='home'),
     path('admin/', admin.site.urls),
-    path('accounts/', include('registration.backends.simple.urls'))
+    path('accounts/', include('registration.backends.simple.urls')),
+    path('api/questions/', api_views.question_list, name="api_question_list"),
 ]
