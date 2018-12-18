@@ -50,6 +50,8 @@ class AnswerSerializer(serializers.ModelSerializer):
     answer_link = serializers.HyperlinkedIdentityField(
         view_name='answer-detail')
 
+    star_count = serializers.IntegerField(source='stars.count', read_only=True)
+
     class Meta:
         model = Answer
         fields = (
@@ -57,6 +59,7 @@ class AnswerSerializer(serializers.ModelSerializer):
                     "question",
                     "text",
                     "author",
+                    'star_count',
                     "created_at",
                     'answer_link'
                 )
@@ -71,6 +74,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         view_name='question-detail')
     answer_list_link = serializers.HyperlinkedIdentityField(
         view_name='question-answer-list')
+    answer_count = serializers.IntegerField(source='answers.count', read_only=True)
     star_count = serializers.IntegerField(source='stars.count', read_only=True)
 
     class Meta:
@@ -82,10 +86,12 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'created_at',
                     'text',
                     'stars',
+                    'star_count',
                     'answers',
+                    'answer_count',
                     'question_link',
-                    'answer_list_link',
-                    'star_count'
+                    'answer_list_link'
+                    
                   )
 
     def create(self, validated_data):
