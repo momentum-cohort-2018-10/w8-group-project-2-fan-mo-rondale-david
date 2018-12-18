@@ -42,26 +42,51 @@ class StarredItemSerializer(serializers.ModelSerializer):
         return StarredItem.objects.create(**validated_data)
 
 
-class AnswerSerializer(serializers.ModelSerializer):                        #Add association to question to nest answers
+class AnswerSerializer(serializers.ModelSerializer):
+    """
+    Add association to question to nest answers
+    """
     author = serializers.StringRelatedField()
+    answer_link = serializers.HyperlinkedIdentityField(
+        view_name='answer-detail')
 
     class Meta:
         model = Answer
-        fields = ("id", "question", "text", "author", "created_at")
+        fields = (
+                    "id",
+                    "question",
+                    "text",
+                    "author",
+                    "created_at",
+                    'answer_link'
+                )
 
 
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
     stars = StarredItemSerializer(many=True, read_only=True)
-
+    answers = AnswerSerializer(many=True)
     question_link = serializers.HyperlinkedIdentityField(
         view_name='question-detail')
+    answer_list_link = serializers.HyperlinkedIdentityField(
+        view_name='question-answer-list')
     star_count = serializers.IntegerField(source='stars.count', read_only=True)
 
     class Meta:
         model = Question
-        fields = ('id', 'title', 'author', 'created_at', 'text', 'stars', 'question_link', 'star_count')
+        fields = (
+                    'id',
+                    'title',
+                    'author',
+                    'created_at',
+                    'text',
+                    'stars',
+                    'answers',
+                    'question_link',
+                    'answer_list_link',
+                    'star_count'
+                  )
 
     def create(self, validated_data):
         return Question.objects.create(**validated_data)
