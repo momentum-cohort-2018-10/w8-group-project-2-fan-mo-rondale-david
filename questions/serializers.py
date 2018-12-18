@@ -25,18 +25,24 @@ class StarredItemRelatedField(serializers.RelatedField):
 
 class StarredItemSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
     star_link = serializers.HyperlinkedIdentityField(view_name='star-detail')
     # content_object = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = StarredItem
-        fields = ('user', 'object_id', 'star_link')
+        fields = ('user', 'object_id', 'content_type', 'star_link')
+
+    def create(self, validated_data):
+        return StarredItem.objects.create(**validated_data)
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    author = serializers.SlugRelatedField(slug_field='username',
+                                          read_only=True)
     stars = StarredItemSerializer(many=True, read_only=True)
-    question_link = serializers.HyperlinkedIdentityField(view_name='question-detail')
+    question_link = serializers.HyperlinkedIdentityField(
+        view_name='question-detail')
 
     class Meta:
         model = Question
