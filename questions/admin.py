@@ -3,7 +3,6 @@ from questions.models import User, Question, Answer, StarredItem
 from django.contrib.auth.admin import UserAdmin
 
 
-
 class QuestionAdmin(admin.ModelAdmin):
 
     model = Question

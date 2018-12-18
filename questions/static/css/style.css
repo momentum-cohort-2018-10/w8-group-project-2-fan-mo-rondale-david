@@ -1,0 +1,37 @@
+body {
+    padding: 1px;
+    background: radial-gradient(#b3ffd7 15%, #fce2ff);
+}
+header {
+    background-color: white;
+    box-shadow: 1px 1px 2px lightgray;
+    margin-bottom: 30px;
+}
+.brand.logo h1 {
+    text-align: center;
+}
+
+.box.question {
+    margin: 40px auto;
+    max-width: 960px;
+}
+
+.box.question .media {
+    flex-wrap: wrap;
+}
+.box.question .media-content {
+    padding-bottom: 30px;
+    border-bottom: 1px solid lightblue;
+}
+.box.question .answer-box {
+    margin: 30px auto;
+    padding: 15px 0 15px 30px;
+    border-radius: 5px;
+    background-color: azure;
+}
+
+.box.question .answer-box .response {
+    padding-left: 10px;
+    border-left: 3px solid green;
+    margin: 10px 0;
+}

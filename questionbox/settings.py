@@ -28,20 +28,34 @@ DEBUG = True
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'questions.User'
 
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'PAGINATE_BY': 10
+}
+
 # Application definition
 
 INSTALLED_APPS = [
+    # MADE
+    'api',
+    'questions',
+  
+    # INSTALLED
     'registration',
+    'rest_framework',
+    'django_extensions',
+    
+    # DJANGO
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'django_extensions',
-    'questions',
-    'api',
 ]
 
 MIDDLEWARE = [
