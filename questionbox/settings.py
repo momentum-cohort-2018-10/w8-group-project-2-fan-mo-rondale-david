@@ -28,9 +28,29 @@ DEBUG = True
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'questions.User'
 
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'PAGINATE_BY': 10
+}
+
 # Application definition
 
 INSTALLED_APPS = [
+    # MADE
+    'api',
+    'questions',
+  
+    # INSTALLED
+    'registration',
+    'rest_framework',
+    'django_extensions',
+    'django_faker',
+
+    # DJANGO
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,12 +58,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # third party apps
-    'django_faker'
-
-    # our apps
-    'questions',
-    'registration',
 ]
 
 MIDDLEWARE = [
@@ -116,7 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
