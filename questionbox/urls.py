@@ -22,5 +22,5 @@ urlpatterns = [
     path('', views.index, name='home'),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
-    path('api/questions/', api_views.question_list, name="api_question_list")
+    path('api/questions/', api_views.question_list, name="api_question_list"),
 ]
