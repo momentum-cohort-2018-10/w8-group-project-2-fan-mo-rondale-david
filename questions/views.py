@@ -6,6 +6,18 @@ from questions.serializers import (
     QuestionSerializer)
 from questions.models import User, StarredItem, Question
 from rest_framework import generics
+from rest_framework.reverse import reverse
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+
+@api_view(('GET',))
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'questions': reverse('question-list', request=request, format=format),
+        'stars': reverse('star-list', request=request, format=format),
+    })
 
 
 def index(request):
@@ -22,7 +34,12 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class StarredItemList(generics.ListAPIView):
+class StarredItemList(generics.ListCreateAPIView):
+    queryset = StarredItem.objects.all()
+    serializer_class = StarredItemSerializer
+
+
+class StarredItemDetail(generics.RetrieveDestroyAPIView):
     queryset = StarredItem.objects.all()
     serializer_class = StarredItemSerializer
 
