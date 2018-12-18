@@ -27,16 +27,26 @@ def index(request):
 
 
 class UserListView(generics.ListAPIView):
+    """
+    Retrieves list of all users
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class UserDetailView(generics.RetrieveAPIView):
+    """
+    Detail page for a single user
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
 class StarredItemList(generics.ListCreateAPIView):
+    """
+    Retrieves list of starred items
+    TODO = make it specific for a logged in user
+    """
     queryset = StarredItem.objects.all()
     serializer_class = StarredItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -46,12 +56,21 @@ class StarredItemList(generics.ListCreateAPIView):
 
 
 class StarredItemDetail(generics.RetrieveDestroyAPIView):
+    """
+    Retrieves details of starred item
+    Only owners and remove their stars
+    TODO = make it specific for a logged in user
+    """
     queryset = StarredItem.objects.all()
     serializer_class = StarredItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsStarOwnerOrReadOnly)
 
 
 class QuestionListView(generics.ListCreateAPIView):
+    """
+    Retrieves list of questions
+    Allows logged in users to submit new questions
+    """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -61,6 +80,10 @@ class QuestionListView(generics.ListCreateAPIView):
 
 
 class QuestionDetailView(generics.RetrieveDestroyAPIView):
+    """
+    Retrieves details of one question
+    Allows only questikon authors to destroy their questions
+    """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,)

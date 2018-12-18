@@ -45,13 +45,15 @@ class StarredItemSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
-    stars = StarredItemSerializer(many=True, read_only=True)
+    # stars = StarredItemSerializer(many=True, read_only=True)
+    
     question_link = serializers.HyperlinkedIdentityField(
         view_name='question-detail')
+    star_count = serializers.IntegerField(source='stars.count', read_only=True)
 
     class Meta:
         model = Question
-        fields = ('title', 'author', 'text', 'stars', 'question_link')
+        fields = ('title', 'author', 'text', 'question_link', 'star_count')
 
     def create(self, validated_data):
         return Question.objects.create(**validated_data)
