@@ -1,5 +1,7 @@
 from questions.models import StarredItem, Question, User, Answer
 from rest_framework import serializers
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -25,6 +27,10 @@ class StarredItemRelatedField(serializers.RelatedField):
 
 class StarredItemSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    content_type = serializers.SlugRelatedField(
+        slug_field='model',
+        queryset=ContentType.objects.filter(
+            Q(model="question") | Q(model="answer")))
 
     star_link = serializers.HyperlinkedIdentityField(view_name='star-detail')
     # content_object = serializers.PrimaryKeyRelatedField(read_only=True)
