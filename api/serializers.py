@@ -46,7 +46,8 @@ class AnswerSerializer(serializers.ModelSerializer):
     """
     Add association to question to nest answers
     """
-    author = serializers.StringRelatedField()
+    author = serializers.StringRelatedField(read_only=True)
+    question = serializers.PrimaryKeyRelatedField(read_only=True)
     answer_link = serializers.HyperlinkedIdentityField(
         view_name='answer-detail')
 
@@ -69,7 +70,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
     stars = StarredItemSerializer(many=True, read_only=True)
-    answers = AnswerSerializer(many=True)
+    answers = AnswerSerializer(many=True, read_only=True)
     question_link = serializers.HyperlinkedIdentityField(
         view_name='question-detail')
     answer_list_link = serializers.HyperlinkedIdentityField(

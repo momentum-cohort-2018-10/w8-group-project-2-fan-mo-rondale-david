@@ -97,9 +97,13 @@ class AnswerDetailView(generics.RetrieveDestroyAPIView):
     serializer_class = AnswerSerializer
 
 
-class QuestionAnswerList(generics.ListAPIView):
+class QuestionAnswerList(generics.ListCreateAPIView):
 
     serializer_class = AnswerSerializer
 
     def get_queryset(self):
         return Answer.objects.filter(question=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        question = Question.objects.get(pk=self.kwargs['pk'])
+        serializer.save(author=self.request.user, question=question)
