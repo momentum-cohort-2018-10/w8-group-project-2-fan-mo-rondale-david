@@ -9,6 +9,8 @@ from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from questions.permissions import IsAuthorOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 @api_view(('GET',))
@@ -47,3 +49,13 @@ class StarredItemDetail(generics.RetrieveDestroyAPIView):
 class QuestionListView(generics.ListCreateAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+
+class QuestionDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,)

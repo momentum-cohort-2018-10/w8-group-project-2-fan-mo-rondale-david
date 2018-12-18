@@ -1,8 +1,5 @@
 from django.urls import path, include
-from rest_framework import routers
 from questions import views as api_views
-from rest_framework.routers import DefaultRouter
-
 
 
 urlpatterns = [
@@ -12,8 +9,13 @@ urlpatterns = [
          api_views.UserDetailView.as_view(),
          name='user-detail'),
     path('stars/', api_views.StarredItemList.as_view(), name='star-list'),
-    path('stars/<pk>', api_views.StarredItemDetail.as_view(), name='star-detail'),
+    path('stars/<pk>',
+         api_views.StarredItemDetail.as_view(),
+         name='star-detail'),
     path('questions/',
          api_views.QuestionListView.as_view(),
          name='question-list'),
+    path('questions/<pk>',
+         api_views.QuestionDetailView.as_view(),
+         name='question-detail'),
 ]
