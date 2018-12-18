@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'registration',
     'rest_framework',
     'django_extensions',
-    'django_faker',
+
 
     # DJANGO
     'django.contrib.admin',
