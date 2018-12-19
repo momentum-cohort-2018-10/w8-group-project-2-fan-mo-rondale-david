@@ -1,11 +1,11 @@
-from api.serializers import QuestionSerializer
 from django.shortcuts import render
 from rest_framework import viewsets
 from api.serializers import (
     UserSerializer,
     StarredItemSerializer,
-    QuestionSerializer)
-from questions.models import User, StarredItem, Question
+    QuestionSerializer,
+    AnswerSerializer)
+from questions.models import User, StarredItem, Question, Answer
 from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -37,6 +37,30 @@ class UserDetailView(generics.RetrieveAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class UserQuestionListView(generics.RetrieveAPIView):
+    """ 
+    Retrieves author's list of questions
+    """
+    serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Question.objects.filter(author=user.id)
+
+
+class UserAnswerListView(generics.RetrieveAPIView):
+    """ 
+    Retrieves author's list of answers
+    """
+    serializer_class = AnswerSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Answer.objects.filter(author=user.id)
 
 
 class StarredItemList(generics.ListCreateAPIView):
@@ -79,7 +103,7 @@ class QuestionListView(generics.ListCreateAPIView):
 class QuestionDetailView(generics.RetrieveDestroyAPIView):
     """
     Retrieves details of one question
-    Allows only questikon authors to destroy their questions
+    Allows only authors to destroy their questions
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
