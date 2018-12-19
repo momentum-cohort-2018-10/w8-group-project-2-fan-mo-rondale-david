@@ -9,23 +9,20 @@ from random import randint
 
 class Command(BaseCommand):
     help = "My shiny new management command."
-    
 
     def add_arguments(self, parser):
         pass
 
     def handle(self, *args, **options):
-        print("Hellloooooooo")
+        User.objects.exclude(username='fan').delete()
+        Question.objects.all().delete()
+        Answer.objects.all().delete()
+
         password = "quizme(11)"
         exp_questions = 50
         exp_users = 20
         avg_answers_per_question = 3
         # avg_stars_per_question = 5
-
-        adminExists = User.objects.filter(username="admin").count()
-        if(adminExists < 1):
-            self.stdout.write("Creating admin user")
-            User.objects.create_superuser("admin", "admin@test.com", password)
 
         num_authors = User.objects.all().count()
         num_questions = Question.objects.all().count()
@@ -44,7 +41,9 @@ class Command(BaseCommand):
             for x in range(num_authors, exp_users):
                 username = faker.name().replace(" ", ".")
                 email = username+"@test.com"
-                User.objects.create_superuser(username, email, password)
+                User.objects.create(username=username,
+                                    email=email,
+                                    password=password)
                 self.stdout.write("  " + username)
             num_authors = User.objects.all().count()
 
@@ -52,7 +51,7 @@ class Command(BaseCommand):
             self.stdout.write(
                 "Creating " + str(exp_questions-num_questions) + "Questions")
             for x in range(num_questions, exp_questions):
-                day_offset = randint(1, 364)
+
                 u = self.randomAuthor()
                 title = "Test Question " + str(x)
                 self.stdout.write(" [" + u.username + "] "+title)
@@ -70,7 +69,7 @@ class Command(BaseCommand):
             rec = Answer()
             rec.author = author
             rec.question = question
-            rec.contents = faker.text()
+            rec.text = faker.text(250)
             rec.save()
             num_answers = Answer.objects.all().count()
             self.stdout.write(str(num_answers) + ": " + author.username +
@@ -85,5 +84,3 @@ class Command(BaseCommand):
         count = Question.objects.aggregate(count=Count('id'))['count']
         random_index = randint(0, count - 1)
         return Question.objects.all()[random_index]
-
-

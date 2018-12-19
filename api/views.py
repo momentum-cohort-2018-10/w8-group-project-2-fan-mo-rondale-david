@@ -1,16 +1,21 @@
-from api.serializers import QuestionSerializer, AnswerSerializer
 from django.shortcuts import render
 from rest_framework import viewsets
 from api.serializers import (
     UserSerializer,
     StarredItemSerializer,
-    QuestionSerializer)
+    QuestionSerializer,
+    AnswerSerializer
+)
 from questions.models import User, StarredItem, Question, Answer
 from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from api.permissions import IsAuthorOrReadOnly, IsStarOwnerOrReadOnly, IsAnswerOwnerOrReadOnly
+from api.permissions import (
+    IsAuthorOrReadOnly,
+    IsStarOwnerOrReadOnly,
+    IsAnswerOwnerOrReadOnly
+)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
@@ -19,7 +24,6 @@ def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'questions': reverse('question-list', request=request, format=format),
-        'answers': reverse('answer-list', request=request, format=format),
         'stars': reverse('star-list', request=request, format=format),
     })
 
@@ -85,11 +89,6 @@ class QuestionDetailView(generics.RetrieveDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,)
-
-
-class AnswerListView(generics.ListAPIView):
-    queryset = Answer.objects.all()
-    serializer_class = AnswerSerializer
 
 
 class AnswerDetailView(generics.RetrieveDestroyAPIView):

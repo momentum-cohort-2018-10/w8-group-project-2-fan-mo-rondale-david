@@ -69,7 +69,6 @@ class AnswerSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
-    stars = StarredItemSerializer(many=True, read_only=True)
     answers = AnswerSerializer(many=True, read_only=True)
     question_link = serializers.HyperlinkedIdentityField(
         view_name='question-detail')
@@ -86,7 +85,6 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'author',
                     'created_at',
                     'text',
-                    'stars',
                     'star_count',
                     'answers',
                     'answer_count',
