@@ -21,7 +21,7 @@ from api import urls as api_urls
 
 
 urlpatterns = [
-    path('', views.index, name='home'),
+    path('', views.QuestionListView.as_view(), name='home'),
     path('api/', include(api_urls)),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),

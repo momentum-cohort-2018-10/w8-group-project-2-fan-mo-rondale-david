@@ -1,10 +1,21 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.views.generic.list import ListView
+from questions.models import Question
 
 
 def index(request):
     return render(request, 'index.html')
+
+
+class QuestionListView(ListView):
+    paginate_by = 10
+    template_name = 'index.html'
+
+    def get_queryset(self):
+        queryset = Question.objects.all().prefetch_related('answers')
+        return queryset
 
 
 def register(request):
