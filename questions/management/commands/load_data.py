@@ -14,7 +14,7 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        User.objects.exclude(username='fan').delete()
+        User.objects.exclude(is_staff=True).delete()
         Question.objects.all().delete()
         Answer.objects.all().delete()
 
@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 rec = Question()
                 rec.author = u
                 rec.title = title
-                rec.text = faker.text()
+                rec.text = faker.text(225)
                 rec.save()
             num_questions = Question.objects.all().count()
 
