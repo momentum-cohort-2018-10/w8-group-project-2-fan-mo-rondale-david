@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from questions import views
+from questions import views as questions_views
 from api import urls as api_urls
 
 
@@ -24,4 +25,7 @@ urlpatterns = [
     path('api/', include(api_urls)),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
+    path('accounts/profile/', views.index, name='account_home'),
+    path('registration/', questions_views.register, name='register'),
+    
 ]
