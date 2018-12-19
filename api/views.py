@@ -145,9 +145,8 @@ class QuestionAnswerList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
-        pk = self.kwargs['pk']
-        user = User.objects.get(pk=pk)
-        return Answer.objects.filter(question=self.kwargs['pk'])
+        question = Question.objects.get(pk=self.kwargs['pk'])
+        return Answer.objects.filter(question=question)
 
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
