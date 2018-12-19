@@ -21,6 +21,7 @@ function closeModal(){
     modal.style.display = "none";
 }
 
+
 document.getElementById('modal-background').addEventListener('click', backgroundCloseModal)
 
 function backgroundCloseModal(){
