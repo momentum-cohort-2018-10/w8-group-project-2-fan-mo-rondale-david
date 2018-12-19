@@ -10,9 +10,12 @@ django-registration-redux = "*"
 djangorestframework = "*"
 django-extensions = "*"
 faker = "*"
+gunicorn = "*"
+django-heroku = "*"
 
 [dev-packages]
 "flake8" = "*"
+yapf = "*"
 
 [requires]
 python_version = "3.7"
