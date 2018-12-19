@@ -53,7 +53,7 @@ class Command(BaseCommand):
                 "Creating " + str(exp_questions-num_questions) + "Questions")
             for x in range(num_questions, exp_questions):
                 day_offset = randint(1, 364)
-                u = self.randomUser()
+                u = self.randomAuthor()
                 title = "Test Question " + str(x)
                 self.stdout.write(" [" + u.username + "] "+title)
                 rec = Question()
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 rec.title = title
                 rec.text = faker.text()
                 rec.save()
-            num_posts = Question.objects.all().count()
+            num_questions = Question.objects.all().count()
 
         self.stdout.write("Answers...")
         while(num_answers < avg_answers_per_question*num_questions):
@@ -77,13 +77,13 @@ class Command(BaseCommand):
                               " gave an answer on [" + question.title + "]")
 
     def randomAuthor(self):
-        count = Author.objects.aggregate(count=Count('id'))['count']
+        count = User.objects.aggregate(count=Count('id'))['count']
         random_index = randint(0, count - 1)
-        return Author.objects.all()[random_index]
+        return User.objects.all()[random_index]
 
     def randomQuestion(self):
-        count = Question.objects.aggregarte(count=Count('id'))['count']
+        count = Question.objects.aggregate(count=Count('id'))['count']
         random_index = randint(0, count - 1)
         return Question.objects.all()[random_index]
 
-    
+
