@@ -44,6 +44,43 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
+class UserQuestionListView(generics.ListAPIView):
+    """
+    Retrieves author's list of questions
+    """
+    serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Question.objects.filter(author=user.id)
+
+
+class UserAnswerListView(generics.ListAPIView):
+    """
+    Retrieves author's list of answers
+    """
+    serializer_class = AnswerSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return Answer.objects.filter(author=user.id)
+
+
+class StarredItemList(generics.ListCreateAPIView):
+    """
+    Retrieves list of starred items
+    TODO = make it specific for a logged in user
+    """
+    queryset = StarredItem.objects.all()
+    serializer_class = StarredItemSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
 class StarredItemDetail(generics.RetrieveDestroyAPIView):
     """
     Retrieves details of starred item
@@ -71,11 +108,30 @@ class QuestionListView(generics.ListCreateAPIView):
 class QuestionDetailView(generics.RetrieveDestroyAPIView):
     """
     Retrieves details of one question
-    Allows only questikon authors to destroy their questions
+    Allows only authors to destroy their questions
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,)
+
+
+class QuestionsByUserListView(generics.ListAPIView):
+    """
+    Retrieves list of questions by selected user
+    """
+    serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        user = User.objects.get(pk=pk)
+        return Question.objects.filter(author=user)
+
+
+class AnswersByUserListView(generics.ListAPIView):
+    """
+    Retrieves list of answers by selected user
+    """
 
 
 class AnswerDetailView(generics.RetrieveDestroyAPIView):
@@ -85,11 +141,12 @@ class AnswerDetailView(generics.RetrieveDestroyAPIView):
 
 
 class QuestionAnswerList(generics.ListCreateAPIView):
-
     serializer_class = AnswerSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
+        pk = self.kwargs['pk']
+        user = User.objects.get(pk=pk)
         return Answer.objects.filter(question=self.kwargs['pk'])
 
     def perform_create(self, serializer):
