@@ -39,7 +39,7 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UserQuestionListView(generics.RetrieveAPIView):
+class UserQuestionListView(generics.ListAPIView):
     """ 
     Retrieves author's list of questions
     """
@@ -51,7 +51,7 @@ class UserQuestionListView(generics.RetrieveAPIView):
         return Question.objects.filter(author=user.id)
 
 
-class UserAnswerListView(generics.RetrieveAPIView):
+class UserAnswerListView(generics.ListAPIView):
     """ 
     Retrieves author's list of answers
     """
@@ -108,3 +108,28 @@ class QuestionDetailView(generics.RetrieveDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,)
+
+
+class QuestionsByUserListView(generics.ListAPIView):
+    """
+    Retrieves list of questions by selected user
+    """
+    serializer_class = QuestionSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        user = User.objects.get(pk=pk)
+        return Question.objects.filter(author=user)
+ 
+class AnswersByUserListView(generics.ListAPIView):
+    """
+    Retrieves list of answers by selected user
+    """
+    serializer_class = AnswerSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        user = User.objects.get(pk=pk)
+        return Answer.objects.filter(author=user)
