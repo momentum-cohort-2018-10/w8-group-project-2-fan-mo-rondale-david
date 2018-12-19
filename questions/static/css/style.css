@@ -1,14 +1,16 @@
 body {
-    padding: 1px;
+    padding-bottom: 20px;
     background: radial-gradient(#b3ffd7 15%, #fce2ff);
 }
 header {
-    background-color: white;
+    background-color: #363636;
     box-shadow: 1px 1px 2px lightgray;
     margin-bottom: 30px;
+    
 }
 .brand.logo h1 {
     text-align: center;
+    color: #f5f5f5;
 }
 
 .box.question {
