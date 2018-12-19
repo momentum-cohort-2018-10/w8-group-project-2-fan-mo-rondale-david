@@ -17,6 +17,7 @@ from api.permissions import (
     IsAnswerOwnerOrReadOnly
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from django.contrib.contenttypes.models import ContentType
 
 
 @api_view(('GET',))
@@ -24,7 +25,6 @@ def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'questions': reverse('question-list', request=request, format=format),
-        'stars': reverse('star-list', request=request, format=format),
     })
 
 
@@ -42,19 +42,6 @@ class UserDetailView(generics.RetrieveAPIView):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-
-class StarredItemList(generics.ListCreateAPIView):
-    """
-    Retrieves list of starred items
-    TODO = make it specific for a logged in user
-    """
-    queryset = StarredItem.objects.all()
-    serializer_class = StarredItemSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 class StarredItemDetail(generics.RetrieveDestroyAPIView):
@@ -108,3 +95,32 @@ class QuestionAnswerList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
         serializer.save(author=self.request.user, question=question)
+
+
+class QuestionStarList(generics.ListCreateAPIView):
+
+    serializer_class = StarredItemSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        content_type = ContentType.objects.get(model='question')
+        return StarredItem.objects.filter(object_id=self.kwargs['pk'],
+                                          content_type=content_type)
+
+    def perform_create(self, serializer):
+        question = Question.objects.get(pk=self.kwargs['pk'])
+        serializer.save(user=self.request.user, content_object=question)
+
+
+class AnswerStarList(generics.ListCreateAPIView):
+    serializer_class = StarredItemSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        content_type = ContentType.objects.get(model='answer')
+        return StarredItem.objects.filter(object_id=self.kwargs['pk'],
+                                          content_type=content_type)
+
+    def perform_create(self, serializer):
+        answer = Answer.objects.get(pk=self.kwargs['pk'])
+        serializer.save(user=self.request.user, content_object=answer)

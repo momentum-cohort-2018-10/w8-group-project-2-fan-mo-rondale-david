@@ -1,7 +1,6 @@
 from questions.models import StarredItem, Question, User, Answer
 from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -27,10 +26,10 @@ class StarredItemRelatedField(serializers.RelatedField):
 
 class StarredItemSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    object_id = serializers.IntegerField(read_only=True)
     content_type = serializers.SlugRelatedField(
         slug_field='model',
-        queryset=ContentType.objects.filter(
-            Q(model="question") | Q(model="answer")))
+        read_only=True)
 
     star_link = serializers.HyperlinkedIdentityField(view_name='star-detail')
 
@@ -48,10 +47,12 @@ class AnswerSerializer(serializers.ModelSerializer):
     """
     author = serializers.StringRelatedField(read_only=True)
     question = serializers.PrimaryKeyRelatedField(read_only=True)
-    answer_link = serializers.HyperlinkedIdentityField(
+    answer_detail_link = serializers.HyperlinkedIdentityField(
         view_name='answer-detail')
 
     star_count = serializers.IntegerField(source='stars.count', read_only=True)
+    star_list_link = serializers.HyperlinkedIdentityField(
+        view_name='answer-star-list')
 
     class Meta:
         model = Answer
@@ -62,18 +63,20 @@ class AnswerSerializer(serializers.ModelSerializer):
                     "author",
                     'star_count',
                     "created_at",
-                    'answer_link'
+                    'answer_detail_link',
+                    'star_list_link'
                 )
 
 
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
-    answers = AnswerSerializer(many=True, read_only=True)
-    question_link = serializers.HyperlinkedIdentityField(
+    question_detail_link = serializers.HyperlinkedIdentityField(
         view_name='question-detail')
     answer_list_link = serializers.HyperlinkedIdentityField(
         view_name='question-answer-list')
+    star_list_link = serializers.HyperlinkedIdentityField(
+        view_name='question-star-list')
     answer_count = serializers.IntegerField(source='answers.count', read_only=True)
     star_count = serializers.IntegerField(source='stars.count', read_only=True)
 
@@ -85,12 +88,12 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'author',
                     'created_at',
                     'text',
-                    'star_count',
-                    'answers',
                     'answer_count',
-                    'question_link',
-                    'answer_list_link'
-                    
+                    'star_count',
+                    'question_detail_link',
+                    'answer_list_link',
+                    'star_list_link'
+
                   )
 
     def create(self, validated_data):
