@@ -36,3 +36,6 @@ def login(request):
         return render(request, 'login.html', {
             'form': form
         })
+
+def profile(request):
+    return render(request, 'questions/profile.html')

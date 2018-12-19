@@ -27,5 +27,5 @@ urlpatterns = [
     path('accounts/', include('registration.backends.simple.urls')),
     path('accounts/profile/', views.index, name='account_home'),
     path('registration/', questions_views.register, name='register'),
-    
+    path('userprofile/', questions_views.profile, name='profile'),
 ]
