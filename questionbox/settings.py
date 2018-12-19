@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'registration',
     'rest_framework',
     'django_extensions',
-    
+
+
     # DJANGO
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
 ]
 
 MIDDLEWARE = [
