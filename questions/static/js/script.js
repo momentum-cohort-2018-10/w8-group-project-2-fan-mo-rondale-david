@@ -20,3 +20,9 @@ document.getElementById('close-modal').addEventListener('click', closeModal)
 function closeModal(){
     modal.style.display = "none";
 }
+
+document.getElementById('modal-background').addEventListener('click', backgroundCloseModal)
+
+function backgroundCloseModal(){
+    modal.style.display = "none";
+}
