@@ -4,13 +4,22 @@ from api.serializers import (
     UserSerializer,
     StarredItemSerializer,
     QuestionSerializer,
+<<<<<<< HEAD
     AnswerSerializer)
+=======
+    AnswerSerializer
+)
+>>>>>>> master
 from questions.models import User, StarredItem, Question, Answer
 from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from api.permissions import IsAuthorOrReadOnly, IsStarOwnerOrReadOnly
+from api.permissions import (
+    IsAuthorOrReadOnly,
+    IsStarOwnerOrReadOnly,
+    IsAnswerOwnerOrReadOnly
+)
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
@@ -126,10 +135,23 @@ class AnswersByUserListView(generics.ListAPIView):
     """
     Retrieves list of answers by selected user
     """
+
+class AnswerDetailView(generics.RetrieveDestroyAPIView):
+    queryset = Answer.objects.all()
+    serializer_class = AnswerSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, IsAnswerOwnerOrReadOnly)
+
+
+class QuestionAnswerList(generics.ListCreateAPIView):
     serializer_class = AnswerSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         pk = self.kwargs['pk']
         user = User.objects.get(pk=pk)
-        return Answer.objects.filter(author=user)
+        return Answer.objects.filter(question=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        question = Question.objects.get(pk=self.kwargs['pk'])
+        serializer.save(author=self.request.user, question=question)
+
