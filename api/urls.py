@@ -18,4 +18,10 @@ urlpatterns = [
     path('questions/<pk>',
          api_views.QuestionDetailView.as_view(),
          name='question-detail'),
+    path('questions/<pk>/answers/',
+         api_views.QuestionAnswerList.as_view(),
+         name='question-answer-list'),
+    path('answers/<pk>',
+         api_views.AnswerDetailView.as_view(),
+         name='answer-detail'),
 ]

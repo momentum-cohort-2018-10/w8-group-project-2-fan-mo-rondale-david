@@ -33,5 +33,5 @@ class Question(Timestamp):
 class Answer(Timestamp):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True, related_name='answers')
     stars = GenericRelation(StarredItem)
