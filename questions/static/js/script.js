@@ -34,6 +34,7 @@ function init() {
     });
 }
 
+
 init()
 
 function starItem(){
@@ -77,4 +78,33 @@ function toggleStar(icon){
     icon.classList.toggle('starred');
     
     console.log(icon);
+
+
+}
+
+document.getElementById('new-question-cancel').addEventListener('click', closeQuestionCancel)
+// click 'cancel' button to close modal
+function closeQuestionCancel(){
+    modal.style.display = "none";
+}
+
+
+document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
+function postNewQuestion(){
+    let question = {
+        text: $('#new-question-text').val()
+    }
+    $.ajax({
+        url: '/api/questions/',
+        method: 'POST',
+        data: JSON.stringify(question), 
+        contentType: 'application/json'
+    }).then(function (question) {
+        addQuestionToList(question)
+        $('#ask-question').removeClass('is-active')
+    })
+}
+
+function addQuestionToList(question){
+    $('question-list').append(question)
 }
