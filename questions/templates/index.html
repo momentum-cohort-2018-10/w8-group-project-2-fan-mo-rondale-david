@@ -12,9 +12,29 @@
     <div id='modal' class="modal">
         <div id='modal-background' class="modal-background"></div>
             <div class="modal-content">
-        
-            </div>
-            <button id='close-modal' class="modal-close is-large" aria-label="close"></button>
+                <div class="box">
+                    <form id='new-question-form'>
+                        <div class="field">
+                            <label class="label" for="new-question">Question</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="new-book-title" name="title">
+                                </div>
+                        </div>
+                    </form>
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <button id="new-question-submit" class="button is-link">Submit</button>
+                            </div>
+                                <div class="control">
+                                    <button id="new-question-cancel" class="button is-text">Cancel</button>
+                                </div>
+                            <div><button id='close-modal' class="modal-close is-large" aria-label="close"></button>
+                            </div>
+                        </div>
+                </div>
+             </div>
+        </div>
+            
     </div>
 
     <div class="box question">
