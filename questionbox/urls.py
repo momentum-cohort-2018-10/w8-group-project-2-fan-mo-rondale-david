@@ -25,7 +25,9 @@ urlpatterns = [
     path('api/', include(api_urls)),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
-    path('accounts/profile/', views.index, name='account_home'),
+    path('accounts/profile/',
+         views.QuestionListView.as_view(),
+         name='account_home'),
     path('registration/', questions_views.register, name='register'),
-    
+
 ]

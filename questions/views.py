@@ -3,10 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.views.generic.list import ListView
 from questions.models import Question
-
-
-def index(request):
-    return render(request, 'index.html')
+from django.contrib.contenttypes.models import ContentType
 
 
 class QuestionListView(ListView):
@@ -14,8 +11,19 @@ class QuestionListView(ListView):
     template_name = 'index.html'
 
     def get_queryset(self):
+
         queryset = Question.objects.all().prefetch_related('answers')
+        breakpoint()
+        # find how to look inside user stars
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        content_type = ContentType.objects.get(model='question')
+        # user_stars.values('object_id')
+        context['user_stars'] = self.request.user.stars.filter(
+            content_type=content_type)
+        return context
 
 
 def register(request):

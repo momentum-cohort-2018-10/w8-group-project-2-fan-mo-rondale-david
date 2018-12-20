@@ -42,3 +42,6 @@ p.box-information {
     border-left: 3px solid green;
     margin: 10px 0;
 }
+i.starred {
+    color: #fff000;
+}
