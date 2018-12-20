@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
@@ -36,3 +37,7 @@ def login(request):
         return render(request, 'login.html', {
             'form': form
         })
+
+@login_required
+def profile(request):
+    return render(request, 'registration/profile.html')

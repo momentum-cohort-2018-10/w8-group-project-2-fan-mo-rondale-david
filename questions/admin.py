@@ -1,10 +1,9 @@
 from django.contrib import admin
-from questions.models import User, Question, Answer, StarredItem
+from questions.models import User, Question, Answer, StarredItem, Profile
 from django.contrib.auth.admin import UserAdmin
 
 
 class QuestionAdmin(admin.ModelAdmin):
-
     model = Question
     list_display = ['title', 'author', 'text']
 
@@ -18,8 +17,11 @@ class StarredItemAdmin(admin.ModelAdmin):
     model = StarredItem
     list_display = ['user', 'content_type', 'object_id', 'content_object']
 
+class ProfileAdmin(admin.ModelAdmin):
+    model = Profile
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Answer, AnswerAdmin)
 admin.site.register(StarredItem, StarredItemAdmin)
+admin.site.register(Profile, ProfileAdmin)
