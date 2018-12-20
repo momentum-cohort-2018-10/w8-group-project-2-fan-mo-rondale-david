@@ -14,7 +14,6 @@ class QuestionListView(ListView):
     def get_queryset(self):
 
         queryset = Question.objects.all().prefetch_related('answers')
-        breakpoint()
         # find how to look inside user stars
         return queryset
 
@@ -22,8 +21,9 @@ class QuestionListView(ListView):
         context = super().get_context_data(**kwargs)
         content_type = ContentType.objects.get(model='question')
         # user_stars.values('object_id')
-        context['user_stars'] = self.request.user.stars.filter(
-            content_type=content_type)
+        user_stars = self.request.user.stars.filter(
+            content_type=content_type).values('object_id')
+        context['user_stars'] = [user_stars['object_id'] for user_stars in user_stars]
         return context
 
 

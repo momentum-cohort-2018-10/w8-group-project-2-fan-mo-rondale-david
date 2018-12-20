@@ -63,10 +63,12 @@
                         
                         <a class="level-item" aria-label="like">
                             <span class="icon is-small">
-                                {% if question.stars.all in user.stars %}
-                                
+                                {% if question.id in user_stars %}
+                                    <i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="{{ question.id }}"></i>
+                                {% else %}
+                                    <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="{{ question.id }}"></i>
                                 {% endif %}
-                                <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="{{ question.id }}"></i>
+                                
                             </span>
                         </a>
                         <div>
