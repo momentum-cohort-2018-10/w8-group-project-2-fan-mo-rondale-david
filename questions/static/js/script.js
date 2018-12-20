@@ -88,6 +88,7 @@ function postNewQuestion(){
     }).then(function (question) {
         addQuestionToList(question)
         $('#ask-question').removeClass('is-active')
+        modal.style.display = "none"
     })
 }
 
