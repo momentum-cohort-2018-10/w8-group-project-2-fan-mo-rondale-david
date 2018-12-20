@@ -18,6 +18,7 @@ from django.urls import path, include
 from questions import views
 from questions import views as questions_views
 from api import urls as api_urls
+from api import views as api_views
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -25,6 +26,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', views.index, name='home'),
     path('api/', include(api_urls)),
+    path('api/questions/', api_views.question_create_or_list, name='api_question_list'),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
     path('accounts/profile/', views.index, name='account_home'),
