@@ -5,5 +5,17 @@
 {% endblock title %}
 
 {% block content %}
-    <h1>{{ user.username }}</h1>
-{% endblock content %} 
+<div class="has-text-centered">
+
+  <div class="tile is-parent">
+    <div class="tile is-child box">
+      <figure class="image container is-128x128">
+        <img class="is-rounded" src="{{ user.profile.image.url }}">
+      </figure><br><br>
+      <h1 class="title is-1 has-text-centered">@{{ user.username }}</h1>
+      <h3 class="subtitle is-3 has-text-centered">{{ user.email }}</h3>
+    </div>
+  </div>
+
+</div>
+{% endblock content %}

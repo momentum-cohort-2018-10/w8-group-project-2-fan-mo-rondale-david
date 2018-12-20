@@ -18,6 +18,8 @@ from django.urls import path, include
 from questions import views
 from questions import views as questions_views
 from api import urls as api_urls
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -29,3 +31,6 @@ urlpatterns = [
     path('registration/', questions_views.register, name='register'),
     path('userprofile/', questions_views.profile, name='profile'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
