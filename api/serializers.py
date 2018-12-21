@@ -1,14 +1,26 @@
 from questions.models import StarredItem, Question, User, Answer
 from rest_framework import serializers
-from django.contrib.contenttypes.models import ContentType
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     user_link = serializers.HyperlinkedIdentityField(view_name='user-detail')
+    user_question_link = serializers.HyperlinkedIdentityField(
+        view_name='question-list-by-user'
+    )
+    user_answer_link = serializers.HyperlinkedIdentityField(
+        view_name='answer-list-by-user'
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'is_staff', 'user_link')
+        fields = (
+            'username',
+            'email',
+            'is_staff',
+            'user_link',
+            'user_question_link',
+            'user_answer_link'
+            )
 
 
 class StarredItemRelatedField(serializers.RelatedField):

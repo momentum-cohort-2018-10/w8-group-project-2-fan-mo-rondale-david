@@ -7,17 +7,23 @@
 {% block content %}
     <h1>Hello & welcome!</h1>
     <p>Got a question? Let's get you an answer!</p>
-    <button id='ask-question'>Ask A ¿Question?</button>
+    <button id='ask-question' class='button is-primary'>Ask A ¿Question?</button>
 
     <div id='modal' class="modal">
         <div id='modal-background' class="modal-background"></div>
             <div class="modal-content">
                 <div class="box">
                     <form id='new-question-form'>
-                        <div class="field">
-                            <label class="label" for="new-question">Question</label>
+                    <div class="field">
+                            <label class="label" for="new-question">Question Title</label>
                                 <div class="control">
-                                    <input class="input" type="text" id="new-book-title" name="title">
+                                    <input class="input" type="text" id="new-question-title" name="text">
+                                </div>
+                        </div>
+                        <div class="field">
+                            <label class="label" for="new-question">Question Text</label>
+                                <div class="control">
+                                    <input class="input" type="text" id="new-question-text" name="text">
                                 </div>
                         </div>
                     </form>
@@ -36,20 +42,24 @@
         </div>
             
     </div>
+    {% for question in object_list %}
+    
 
     <div class="box question">
         <article class="media">
             
             <div class="media-content">
                 <div class="content">
-                    <p>
-                        <small>@johnsmith</small> <small>31m</small>
-                        <br>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                    </p>
+                    <h2>{{ question.title }}</h2>
+                        <p class="box-information">
+                        <small>{{ question.author }}</small> - <small>{{ question.created_at }}</small>
+                        </p>
+
+                        {{ question.text }}
+
                 </div>
                 <nav class="level is-mobile">
-                    <div class="level-left">
+                    <div class="level-left question-controls">
 
                         <a class="level-item" aria-label="reply">
                             <span class="icon is-small">
@@ -59,70 +69,39 @@
                         
                         <a class="level-item" aria-label="like">
                             <span class="icon is-small">
-                                <i class="fas fa-star fa-lg" aria-hidden="true"></i>
-                            </span>
-                        </a>
-                        <div>
-                            <p><strong>3 Answers</strong></p>
-                        </div>
-                    </div>
-                </nav>
-            </div>
-            
-            <div class="answer-box">
-                
-                <div class="response">
-                    <p>
-                        <small>@johnsmith</small> <small>31m</small>
-                        <br>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                    </p>
-                </div>
-            </div>
-        </article>
-    </div>
-    <div class="box question">
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <p>
-                        <small>@johnsmith</small> <small>31m</small>
-                        <br>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                    </p>
-                </div>
-                <nav class="level is-mobile">
-                    <div class="level-left">
+                                
+                                {% if question.star %}
+                                    <i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="{{ question.id }}"></i>
+                                {% else %}
+                                    <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="{{ question.id }}"></i>
+                                {% endif %}
 
-                        <a class="level-item" aria-label="reply">
-                            <span class="icon is-small">
-                                <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
-                            </span>
-                        </a>
-                        
-                        <a class="level-item" aria-label="like">
-                            <span class="icon is-small">
-                                <i class="fas fa-star fa-lg" aria-hidden="true"></i>
                             </span>
                         </a>
                         <div>
-                            <p><strong>3 Answers</strong></p>
+                            <p><strong>{{ question.answers.count }} Answer{{ question.answers.count|pluralize }}</strong></p>
                         </div>
                     </div>
                 </nav>
             </div>
-            
+            {% if question.answers.all %}
             <div class="answer-box">
                 
                 <div class="response">
                     <p>
-                        <small>@johnsmith</small> <small>31m</small>
+                        <small>{{ question.answers.all.0.author }}</small> - <small>{{ question.answers.all.0.created_at }}</small>
                         <br>
+                        {{ question.answers.all.0.text }}
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
                     </p>
                 </div>
+
+                
             </div>
+            {% endif %}
         </article>
     </div>
+    {% empty %}
+        <p>No questions yet!</p>
+    {% endfor %}
 {% endblock content %}

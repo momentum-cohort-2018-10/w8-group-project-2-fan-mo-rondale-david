@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from rest_framework import viewsets
 from api.serializers import (
     UserSerializer,
     StarredItemSerializer,
@@ -16,15 +14,25 @@ from api.permissions import (
     IsStarOwnerOrReadOnly,
     IsAnswerOwnerOrReadOnly
 )
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated
+)
 from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 
 
-@api_view(('GET',))
+@api_view(['GET',])
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'questions': reverse('question-list', request=request, format=format),
+        'my-questions': reverse('user-question-list',
+                                request=request,
+                                format=format),
+        'my-answers': reverse('user-answer-list',
+                              request=request,
+                              format=format)
     })
 
 
@@ -44,16 +52,22 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UserQuestionListView(generics.ListAPIView):
+class UserQuestionListView(generics.ListCreateAPIView):
     """
     Retrieves author's list of questions
     """
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        user = self.request.user
-        return Question.objects.filter(author=user.id)
+        if self.kwargs.get('username'):
+            username = self.kwargs['username']
+            user = get_object_or_404(User, username=username)
+            return self.request.user.questions.all()
+        # return Question.objects.filter(author=user.id)
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class UserAnswerListView(generics.ListAPIView):
@@ -61,7 +75,7 @@ class UserAnswerListView(generics.ListAPIView):
     Retrieves author's list of answers
     """
     serializer_class = AnswerSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
