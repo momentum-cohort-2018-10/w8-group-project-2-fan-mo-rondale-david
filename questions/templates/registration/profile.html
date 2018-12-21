@@ -12,9 +12,13 @@
     <div class="tile is-child box">
       <figure class="image container is-128x128">
         <img class="is-rounded" src="{{ user|gravatar:50 }}" />
-      </figure><br><br>
+      </figure><br>
       <h1 class="title is-1 has-text-centered">@{{ user.username }}</h1>
       <h3 class="subtitle is-3 has-text-centered">{{ user.email }}</h3>
+      <h2 class="subtitle">First Name: {{ user.first_name }}</h2>
+      <h2 class="subtitle">Last Name: {{ user.last_name }}</h2>
+      <a class="button is-warning" href="{% url 'edit_profile' %}">Edit Profile</a>
+      <a class="button is-info" href="{% url 'change_password' %}">Change Password</a>
     </div>
   </div>
 
