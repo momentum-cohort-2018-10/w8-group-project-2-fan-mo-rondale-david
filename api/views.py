@@ -21,29 +21,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET',])
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'questions': reverse('question-list', request=request, format=format),
     })
-
-def question_create_or_list(request):
-    if request.method == "POST":
-        return create_question(request)
-    return question_list(request)
-
-def question_list(request):
-    questions = Question.objects.filter(author=request.user)
-    serializer = QuestionSerializer(questions, many=True)
-    return Response(serializer.data)
-
-def create_question(request):
-    serializer = QuestionSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save(author=request.user)
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
 
 
 class UserListView(generics.ListAPIView):
