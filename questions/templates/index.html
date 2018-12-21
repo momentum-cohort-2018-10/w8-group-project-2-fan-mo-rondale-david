@@ -86,17 +86,17 @@
             </div>
             {% if question.answers.all %}
             <div class="answer-box">
-                
-                <div class="response">
-                    <p>
-                        <small>{{ question.answers.all.0.author }}</small> - <small>{{ question.answers.all.0.created_at }}</small>
-                        <br>
-                        {{ question.answers.all.0.text }}
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                    </p>
-                </div>
+                {% for answer in question.answers.all %}
+                    <div class="response">
+                        <p>
+                            <small>{{ answer.author }}</small> - <small>{{ answer.created_at }}</small>
+                            <br>
+                            {{ answer.text }}
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                        </p>
+                    </div>
 
-                
+                {% endfor %}
             </div>
             {% endif %}
         </article>

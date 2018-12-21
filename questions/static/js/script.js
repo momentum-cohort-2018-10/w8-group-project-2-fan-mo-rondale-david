@@ -69,7 +69,7 @@ function init() {
     document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
         star.addEventListener('click', starItem);
     });
-    document.getElementById('new-question-cancel').addEventListener('click', closeQuestionCancel)
+    document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
     document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
 
 }
@@ -116,9 +116,6 @@ function unstarItem(){
 function toggleStar(icon){
     icon.classList.toggle('unstarred');
     icon.classList.toggle('starred');
-    
-    console.log(icon);
-
 
 }
 
