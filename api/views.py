@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from rest_framework import viewsets
 from api.serializers import (
     UserSerializer,
     StarredItemSerializer,
@@ -16,7 +14,10 @@ from api.permissions import (
     IsStarOwnerOrReadOnly,
     IsAnswerOwnerOrReadOnly
 )
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAuthenticated
+)
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -55,7 +56,7 @@ class UserQuestionListView(generics.ListAPIView):
     Retrieves author's list of questions
     """
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
@@ -67,7 +68,7 @@ class UserAnswerListView(generics.ListAPIView):
     Retrieves author's list of answers
     """
     serializer_class = AnswerSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = self.request.user
