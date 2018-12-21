@@ -24,8 +24,45 @@ function toggleModal(){
     modal.classList.toggle('is-active');
 }
 
+function questionHTML(question){
+    return `
+    <div class="box question">
+    <article class="media">
+        
+        <div class="media-content">
+            <div class="content">
+                <p>
+                    <small>${question.author}</small> <small>31m</small>
+                    <br>
+                    ${question.text}
+                </p>
+            </div>
+            <nav class="level is-mobile">
+                <div class="level-left">
+
+                    <a class="level-item" aria-label="reply">
+                        <span class="icon is-small">
+                            <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                    
+                    <a class="level-item" aria-label="like">
+                        <span class="icon is-small">
+                            <i class="fas fa-star fa-lg" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </article>
+</div>
+`
+}
+
+
 function init() {
     document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
+    // click button to ask a question, opens modal with form
     document.getElementById('ask-question').addEventListener('click', toggleModal);
     document.getElementById('close-modal').addEventListener('click', toggleModal);
     document.getElementById('modal-background').addEventListener('click', toggleModal);
@@ -34,6 +71,7 @@ function init() {
     });
     document.getElementById('new-question-cancel').addEventListener('click', closeQuestionCancel)
     document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
+
 }
 
 
@@ -85,13 +123,9 @@ function toggleStar(icon){
 }
 
 
-// click 'cancel' button to close modal
-function closeQuestionCancel(){
-    modal.style.display = "none";
-}
-
 function postNewQuestion(){
     let question = {
+        title: $('#new-question-title').val(),
         text: $('#new-question-text').val()
     }
     $.ajax({
@@ -102,9 +136,45 @@ function postNewQuestion(){
     }).then(function (question) {
         addQuestionToList(question)
         $('#ask-question').removeClass('is-active')
+        modal.style.display = "none"
     })
 }
 
-function addQuestionToList(question){
-    $('question-list').append(question)
+
+function loadQuestions(){
+    $.get('/api/questions')
+      .then(function (questions) {
+          for (let question of questions) {
+              addQuestionToList(question)
+          }
+      })
 }
+
+
+function addQuestionToList(question){
+    $('question-list').append(questionHTML(question))
+}
+
+function setupCSRFAjax () {
+    var csrftoken = Cookies.get('csrftoken')
+  
+    $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader('X-CSRFToken', csrftoken)
+        }
+      }
+    })
+  }
+
+function startQuestions() {
+    loadQuestions()
+    setupCSRFAjax()
+}
+
+function csrfSafeMethod(method){
+// these HTTP methods do not require CSRF protection
+return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+}
+
+startQuestions()
