@@ -25,6 +25,12 @@ def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
         'questions': reverse('question-list', request=request, format=format),
+        'my-questions': reverse('user-question-list',
+                                request=request,
+                                format=format),
+        'my-answers': reverse('user-answer-list',
+                              request=request,
+                              format=format)
     })
 
 
