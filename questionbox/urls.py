@@ -30,7 +30,6 @@ urlpatterns = [
     path('accounts/profile/',
          views.QuestionListView.as_view(),
          name='account_home'),
-    path('registration/', questions_views.register, name='register'),
     path('userprofile/', questions_views.profile, name='profile'),
 ]
 

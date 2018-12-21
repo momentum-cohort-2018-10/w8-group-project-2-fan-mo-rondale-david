@@ -32,6 +32,8 @@ function init() {
     document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
         star.addEventListener('click', starItem);
     });
+    document.getElementById('new-question-cancel').addEventListener('click', closeQuestionCancel)
+    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
 }
 
 
@@ -82,14 +84,12 @@ function toggleStar(icon){
 
 }
 
-document.getElementById('new-question-cancel').addEventListener('click', closeQuestionCancel)
+
 // click 'cancel' button to close modal
 function closeQuestionCancel(){
     modal.style.display = "none";
 }
 
-
-document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
 function postNewQuestion(){
     let question = {
         text: $('#new-question-text').val()
