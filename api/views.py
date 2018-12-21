@@ -19,9 +19,10 @@ from rest_framework.permissions import (
     IsAuthenticated
 )
 from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 
 
-@api_view(('GET',))
+@api_view(['GET',])
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
@@ -51,7 +52,7 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UserQuestionListView(generics.ListAPIView):
+class UserQuestionListView(generics.ListCreateAPIView):
     """
     Retrieves author's list of questions
     """
@@ -59,8 +60,14 @@ class UserQuestionListView(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        user = self.request.user
-        return Question.objects.filter(author=user.id)
+        if self.kwargs.get('username'):
+            username = self.kwargs['username']
+            user = get_object_or_404(User, username=username)
+            return self.request.user.questions.all()
+        # return Question.objects.filter(author=user.id)
+    
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class UserAnswerListView(generics.ListAPIView):

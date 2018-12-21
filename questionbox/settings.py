@@ -31,8 +31,13 @@ AUTH_USER_MODEL = 'questions.User'
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+       'rest_framework.authentication.TokenAuthentication',
+       'rest_framework.authentication.SessionAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.AllowAny', 
+        "rest_framework.permissions.IsAuthenticated",
     ],
     'PAGINATE_BY': 10
 }
@@ -56,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
