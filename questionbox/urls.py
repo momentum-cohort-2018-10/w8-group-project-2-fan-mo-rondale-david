@@ -30,6 +30,8 @@ urlpatterns = [
     path('accounts/profile/', views.index, name='account_home'),
     path('registration/', questions_views.register, name='register'),
     path('userprofile/', questions_views.profile, name='profile'),
+    path('userprofile/edit/', questions_views.edit_profile, name='edit_profile'),
+    path('change-password/', questions_views.change_password, name='change_password'),
 ]
 
 if settings.DEBUG:
