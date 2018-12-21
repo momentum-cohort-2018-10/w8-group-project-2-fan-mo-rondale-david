@@ -20,6 +20,7 @@ class QuestionListView(ListView):
                 'WHERE content_type_id = 8 and user_id = %s) '
                 's ON q.id = s.object_id', (user_id,)
                 ).prefetch_related('answers')
+
         else:
             queryset = Question.objects.all().prefetch_related('answers')
         return queryset
