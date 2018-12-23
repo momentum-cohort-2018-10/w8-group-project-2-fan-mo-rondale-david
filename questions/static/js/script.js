@@ -174,7 +174,33 @@ function csrfSafeMethod(method){
 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
 }
 
-startQuestions()
+
 
 // Following code is for infinite scrolling feature
+
+// init controller
 var controller = new ScrollMagic.Controller()
+// create scene
+var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
+        .addTo(controller)
+        .addIndicators()
+        .on("enter", function (e) {
+            if (!$("#loader").hasClass("active")) {
+                $("#loader").addClass("active");
+                if (console){
+                    console.log("loading new items");
+                }
+                // ajax call to add content using function below
+                $.get("/api/questions/", addMore (10))
+                }})
+
+function addMore (amount) {
+                    for (i=1; i <= amount; i++) {
+                        $("<div>How do I get new questions to load from database?</div>")
+                        .addClass("box question")
+                        .appendTo("#all-questions");
+                    }
+                    scene.update();
+                    $("#loader").removeClass("active")}
+
+startQuestions()

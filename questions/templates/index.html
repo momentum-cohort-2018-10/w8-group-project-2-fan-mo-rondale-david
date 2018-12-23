@@ -42,6 +42,8 @@
         </div>
             
     </div>
+
+<div id="all-questions">
     {% for question in object_list %}
     
 
@@ -102,13 +104,14 @@
         </article>
     </div>
 
+
     
     {% empty %}
         <p>No questions yet!</p>
     {% endfor %}
-
+</div>
     <div id="loader" style="text-align: center">
-        <img style="max-width: 20%; height: auto" src="https://cdn.dribbble.com/users/69182/screenshots/2151363/animated_loading__by__amiri.gif"><br>
+        <img style="max-width: 15%; height: auto" src="https://cdn.dribbble.com/users/69182/screenshots/2151363/animated_loading__by__amiri.gif"><br>
         LOADING...
     </div>
 
