@@ -105,7 +105,6 @@ function toggleStar(icon){
 
 }
 
-
 function postNewQuestion(){
     let question = {
         title: $('#new-question-title').val(),
@@ -132,7 +131,6 @@ function loadQuestions(){
           }
       })
 }
-
 
 function addQuestionToList(question){
     $('question-list').append(questionHTML(question))

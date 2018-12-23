@@ -151,5 +151,6 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-django_heroku.settings(locals())
+LOGIN_REDIRECT_URL = 'home'
 
+django_heroku.settings(locals())
