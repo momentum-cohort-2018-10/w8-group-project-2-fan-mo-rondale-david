@@ -47,7 +47,7 @@ class StarredItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StarredItem
-        fields = ('user', 'object_id', 'content_type', 'star_link')
+        fields = ('pk', 'user', 'object_id', 'content_type', 'star_link')
 
     def create(self, validated_data):
         return StarredItem.objects.create(**validated_data)

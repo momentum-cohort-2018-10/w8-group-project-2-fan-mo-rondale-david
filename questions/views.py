@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from questions.forms import EditProfileForm
 from django.views.generic.list import ListView
 from questions.models import Question
+from django.contrib.contenttypes.models import ContentType
 
 
 class QuestionListView(ListView):
@@ -13,12 +14,14 @@ class QuestionListView(ListView):
     def get_queryset(self):
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
+            content_type = ContentType.objects.get(model='question').id
+
             queryset = Question.objects.raw(
                 'SELECT q.*, s.id AS star '
                 'from questions_question q LEFT JOIN '
                 '(SELECT * FROM questions_starreditem '
-                'WHERE content_type_id = 8 and user_id = %s) '
-                's ON q.id = s.object_id', (user_id,)
+                'WHERE content_type_id = %s and user_id = %s) '
+                's ON q.id = s.object_id', (content_type, user_id,)
                 ).prefetch_related('answers')
 
         else:

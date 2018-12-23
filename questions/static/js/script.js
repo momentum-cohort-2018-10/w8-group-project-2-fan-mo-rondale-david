@@ -1,34 +1,8 @@
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-let csrftoken = getCookie('csrftoken');
-
-function toggleNavBar(){
-    this.classList.toggle('is-active');
-    document.querySelector('.navbar-menu').classList.toggle('is-active');
-}
-function toggleModal(){
-    modal.classList.toggle('is-active');
-}
-
 function questionHTML(question){
     return `
     <div class="box question">
     <article class="media">
-        
+        xs
         <div class="media-content">
             <div class="content">
                 <p>
@@ -66,50 +40,62 @@ function init() {
     document.getElementById('ask-question').addEventListener('click', toggleModal);
     document.getElementById('close-modal').addEventListener('click', toggleModal);
     document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
-        star.addEventListener('click', starItem);
+    document.querySelectorAll('.question-controls i').forEach(function(star){
+        star.addEventListener('click', starHandler);
     });
     document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
     document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
 
 }
-
+function toggleNavBar(){
+    this.classList.toggle('is-active');
+    document.querySelector('.navbar-menu').classList.toggle('is-active');
+}
+function toggleModal(){
+    modal.classList.toggle('is-active');
+}
 
 init()
 
-function starItem(){
-    pk = this.attributes['data-question'].value;
+function starHandler() {
+    console.log(this);
+    if (this.attributes['data-star']) {
+        pk = this.attributes['data-star'].value;
+        unstarItem(pk);
+    } else {
+        pk = this.attributes['data-question'].value;
+        starItem(pk);
+    }
+}
+
+function starItem(pk){
+    
     $.ajax({
         method: 'POST',
-        url: `api/questions/${pk}/stars/`,
-        data: {
-            csrfmiddlewaretoken: csrftoken,
-        }
+        url: `api/questions/${pk}/stars/`
     }).done(function(response) {
         star = document.querySelector(`i[data-question='${response.object_id}']`);
+        star.setAttribute('data-star', response.pk);
+        star.addEventListener('click', unstarItem);
         toggleStar(star);
         console.log(response);
     }).fail(function(response) {
-        console.log("There was an error");
+        console.log("There was an error making the star");
         console.log(response);
     });
 }
 
-function unstarItem(){
-    pk = this.attributes['data-question'].value;
+function unstarItem(pk){
+    
     $.ajax({
         method: 'DELETE',
-        url: `api/questions/${pk}/stars/`,
-        data: {
-            csrfmiddlewaretoken: csrftoken,
-        }
+        url: `api/stars/${pk}/`,
+        dataType: 'text'
     }).done(function(response) {
-        star = document.querySelector(`i[data-question='${response.object_id}']`);
+        star = document.querySelector(`i[data-star='${pk}']`);
+        star.removeAttribute('data-star');
         toggleStar(star);
-        console.log(response);
-    }).fail(function(response) {
-        console.log("There was an error");
-        console.log(response);
+        
     });
 }
 

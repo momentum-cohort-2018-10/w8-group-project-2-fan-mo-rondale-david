@@ -71,7 +71,7 @@
                             <span class="icon is-small">
                                 
                                 {% if question.star %}
-                                    <i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="{{ question.id }}"></i>
+                                    <i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="{{ question.id }}" data-star="{{ question.star }}"></i>
                                 {% else %}
                                     <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="{{ question.id }}"></i>
                                 {% endif %}

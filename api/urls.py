@@ -21,7 +21,7 @@ urlpatterns = [
     path('users/<pk>/answers/',
          api_views.AnswersByUserListView.as_view(),
          name='answer-list-by-user'),
-    path('stars/<pk>',
+    path('stars/<pk>/',
          api_views.StarredItemDetail.as_view(),
          name='star-detail'),
     path('questions/',
