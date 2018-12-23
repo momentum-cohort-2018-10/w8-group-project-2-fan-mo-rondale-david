@@ -175,3 +175,6 @@ return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
 }
 
 startQuestions()
+
+// Following code is for infinite scrolling feature
+var controller = new ScrollMagic.Controller()

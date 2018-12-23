@@ -45,7 +45,7 @@
     {% for question in object_list %}
     
 
-    <div class="box question">
+    <div class="box question" id="box-question">
         <article class="media">
             
             <div class="media-content">
@@ -101,7 +101,15 @@
             {% endif %}
         </article>
     </div>
+
+    
     {% empty %}
         <p>No questions yet!</p>
     {% endfor %}
+
+    <div id="loader" style="text-align: center">
+        <img style="max-width: 20%; height: auto" src="https://cdn.dribbble.com/users/69182/screenshots/2151363/animated_loading__by__amiri.gif"><br>
+        LOADING...
+    </div>
+
 {% endblock content %}
