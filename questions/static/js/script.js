@@ -12,45 +12,11 @@ function init() {
 }
 init()
 
-function questionHTML(question){
-    return `
-    <div class="box question">
-    <article class="media">
-        xs
-        <div class="media-content">
-            <div class="content">
-                <p>
-                    <small>${question.author}</small> <small>31m</small>
-                    <br>
-                    ${question.text}
-                </p>
-            </div>
-            <nav class="level is-mobile">
-                <div class="level-left">
-
-                    <a class="level-item" aria-label="reply">
-                        <span class="icon is-small">
-                            <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
-                        </span>
-                    </a>
-                    
-                    <a class="level-item" aria-label="like">
-                        <span class="icon is-small">
-                            <i class="fas fa-star fa-lg" aria-hidden="true"></i>
-                        </span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </article>
-</div>
-`
-}
-
 function toggleNavBar(){
     this.classList.toggle('is-active');
     document.querySelector('.navbar-menu').classList.toggle('is-active');
 }
+
 
 function starHandler() {
     console.log(this);
@@ -104,7 +70,7 @@ function toggleStar(icon){
 function resolveQuestion(){
     pk = this.attributes['data-question'].value;
     answer = this.attributes['data-answer'].value;
-    
+
     $.ajax({
         method: 'POST',
         url: `/api/questions/${pk}/resolve/`,
@@ -122,7 +88,6 @@ function resolveQuestion(){
     });
 }
 
-
 function removeResolveButtons(question){
     let questionBlock = document.querySelector(`div[data-question="${question}"]`);
     
@@ -136,6 +101,41 @@ function addResolutionBlock(answer){
     response.parentNode.parentNode.classList.add('resolution')
 }
 
+
+function questionHTML(question){
+    return `
+    <div class="box question">
+    <article class="media">
+        xs
+        <div class="media-content">
+            <div class="content">
+                <p>
+                    <small>${question.author}</small> <small>31m</small>
+                    <br>
+                    ${question.text}
+                </p>
+            </div>
+            <nav class="level is-mobile">
+                <div class="level-left">
+
+                    <a class="level-item" aria-label="reply">
+                        <span class="icon is-small">
+                            <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                    
+                    <a class="level-item" aria-label="like">
+                        <span class="icon is-small">
+                            <i class="fas fa-star fa-lg" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </article>
+</div>
+`
+}
 
 function postNewQuestion(){
     let question = {
