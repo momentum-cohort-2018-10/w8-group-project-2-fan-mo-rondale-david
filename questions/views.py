@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from questions.forms import EditProfileForm
 from django.views.generic.list import ListView
 from questions.models import Question
-
+from django.contrib.auth import update_session_auth_hash
 
 class QuestionListView(ListView):
     paginate_by = 10
@@ -49,6 +49,7 @@ def change_password(request):
         
         if form.is_valid():
             form.save()
+            update_session_auth_hash(request, form.user)
             return redirect('profile')
         else:
             return redirect('change_password')
