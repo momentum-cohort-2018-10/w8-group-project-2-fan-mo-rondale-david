@@ -1,3 +1,17 @@
+function init() {
+    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
+    document.getElementById('close-modal').addEventListener('click', toggleModal);
+    document.getElementById('modal-background').addEventListener('click', toggleModal);
+    document.querySelectorAll('.question-controls i').forEach(function(star){
+        star.addEventListener('click', starHandler);
+    });
+    document.querySelectorAll('.answer-controls .check').forEach(function(check){
+        check.addEventListener('click', resolveQuestion);
+    });
+
+}
+init()
+
 function questionHTML(question){
     return `
     <div class="box question">
@@ -33,29 +47,10 @@ function questionHTML(question){
 `
 }
 
-
-function init() {
-    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
-    // click button to ask a question, opens modal with form
-    document.getElementById('ask-question').addEventListener('click', toggleModal);
-    document.getElementById('close-modal').addEventListener('click', toggleModal);
-    document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls i').forEach(function(star){
-        star.addEventListener('click', starHandler);
-    });
-    document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
-    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
-
-}
 function toggleNavBar(){
     this.classList.toggle('is-active');
     document.querySelector('.navbar-menu').classList.toggle('is-active');
 }
-function toggleModal(){
-    modal.classList.toggle('is-active');
-}
-
-init()
 
 function starHandler() {
     console.log(this);
@@ -105,6 +100,43 @@ function toggleStar(icon){
 
 }
 
+
+function resolveQuestion(){
+    pk = this.attributes['data-question'].value;
+    answer = this.attributes['data-answer'].value;
+    
+    $.ajax({
+        method: 'POST',
+        url: `/api/questions/${pk}/resolve/`,
+        data: {
+            resolving_answer: answer
+        }
+    }).done(function(response){
+        addResolutionBlock(response.resolving_answer);
+        removeResolveButtons(response.resolved_question);
+        
+        console.log(response);
+    }).fail(function(response){
+        console.log('There was an error resolving this question');
+        console.log(response);
+    });
+}
+
+
+function removeResolveButtons(question){
+    let questionBlock = document.querySelector(`div[data-question="${question}"]`);
+    
+    questionBlock.querySelectorAll('a.check').forEach(function(button){
+        button.parentNode.innerHTML = "";
+    });
+}
+
+function addResolutionBlock(answer){
+    let response = document.querySelector(`a[data-answer="${answer}"]`);
+    response.parentNode.parentNode.classList.add('resolution')
+}
+
+
 function postNewQuestion(){
     let question = {
         title: $('#new-question-title').val(),
@@ -149,8 +181,15 @@ function setupCSRFAjax () {
   }
 
 function startQuestions() {
+    // click button to ask a question, opens modal with form
+    document.getElementById('ask-question').addEventListener('click', toggleModal);
+    document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
+    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
     loadQuestions()
     setupCSRFAjax()
+}
+function toggleModal(){
+    modal.classList.toggle('is-active');
 }
 
 function csrfSafeMethod(method){

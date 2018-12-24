@@ -21,7 +21,6 @@ from rest_framework.permissions import (
     IsAuthenticated
 )
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import get_object_or_404
 
 
 @api_view(['GET',])
