@@ -116,11 +116,6 @@ function questionHTML(question){
                 </div>
                 <nav class="level is-mobile">
                     <div class="level-left question-controls">
-                        <a class="level-item" aria-label="reply">
-                            <span class="icon is-medium">
-                                <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
-                            </span>
-                        </a>
                         <a class="level-item" aria-label="like">
                             <span class="icon is-medium">
                                     <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>
@@ -150,9 +145,8 @@ function postNewQuestion(){
     }).then(function (question) {
         console.log(question);
         addQuestionToList(question)
-        $('#ask-question').removeClass('is-active')
-        modal.style.display = "none"
-    })
+        toggleModal();
+    });
 }
 
 
@@ -167,6 +161,7 @@ function loadQuestions(){
 
 function addQuestionToList(question){
     document.getElementById('question-list').insertAdjacentHTML('afterbegin', questionHTML(question));
+    document.querySelector('.question-controls i').addEventListener('click', starHandler);
 }
 
 function startQuestions() {
