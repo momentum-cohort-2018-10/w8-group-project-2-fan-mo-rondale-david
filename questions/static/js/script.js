@@ -148,6 +148,7 @@ function postNewQuestion(){
         data: JSON.stringify(question), 
         contentType: 'application/json'
     }).then(function (question) {
+        console.log(question);
         addQuestionToList(question)
         $('#ask-question').removeClass('is-active')
         modal.style.display = "none"
@@ -158,14 +159,28 @@ function postNewQuestion(){
 function loadQuestions(){
     $.get('/api/questions')
       .then(function (questions) {
-          for (let question of questions) {
-              addQuestionToList(question)
-          }
+        //   for (let question of questions) {
+        //       addQuestionToList(question)
+        //   }
       })
 }
 
 function addQuestionToList(question){
-    $('question-list').append(questionHTML(question))
+    document.getElementById('question-list').insertAdjacentHTML('afterbegin', questionHTML(question));
+}
+
+function startQuestions() {
+    // click button to ask a question, opens modal with form
+    document.getElementById('ask-question').addEventListener('click', toggleModal);
+    document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
+    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
+    loadQuestions()
+    setupCSRFAjax()
+}
+startQuestions()
+
+function toggleModal(){
+    modal.classList.toggle('is-active');
 }
 
 function setupCSRFAjax () {
@@ -178,18 +193,6 @@ function setupCSRFAjax () {
         }
       }
     })
-  }
-
-function startQuestions() {
-    // click button to ask a question, opens modal with form
-    document.getElementById('ask-question').addEventListener('click', toggleModal);
-    document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
-    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
-    loadQuestions()
-    setupCSRFAjax()
-}
-function toggleModal(){
-    modal.classList.toggle('is-active');
 }
 
 function csrfSafeMethod(method){
@@ -197,4 +200,3 @@ function csrfSafeMethod(method){
 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
 }
 
-startQuestions()
