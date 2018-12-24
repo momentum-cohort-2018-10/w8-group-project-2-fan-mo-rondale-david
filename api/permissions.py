@@ -1,9 +1,29 @@
 from rest_framework import permissions
+from questions.models import Question
+
+
+class OnlyAuthorCanMarkResolved(permissions.BasePermission):
+    """
+    Only question authors can mark an answer as resolved
+    """
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+
+        question = Question.objects.get(pk=view.kwargs['pk'])
+
+        return question.author == request.user
+
+    def has_object_permission(self, request, view, resolve):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return resolve.resolved_question.author == request.user
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     """
-    Only post authors can delete their posts
+    Only question authors can delete their posts
     """
 
     def has_object_permission(self, request, view, question):

@@ -1,4 +1,4 @@
-from questions.models import StarredItem, Question, User, Answer
+from questions.models import StarredItem, Question, User, Answer, Resolve
 from rest_framework import serializers
 
 
@@ -34,6 +34,36 @@ class StarredItemRelatedField(serializers.RelatedField):
             raise Exception('Unexpected type of starred object.')
 
         return serializer.data
+
+
+class ResolveAnswerField(serializers.PrimaryKeyRelatedField):
+    def get_queryset(self):
+        question = Question.objects.get(pk=self.self.kwargs['pk'])
+        return Answer.objects.filter(question=question)
+
+
+class ResolveSerializer(serializers.ModelSerializer):
+    resolved_question = serializers.PrimaryKeyRelatedField(read_only=True)
+    resolving_answer = serializers.PrimaryKeyRelatedField(
+        queryset=Answer.objects.all())
+
+    class Meta:
+        model = Resolve
+        fields = (
+            'resolved_question',
+            'resolving_answer'
+        )
+
+    def create(self, validated_data):
+        return Resolve.objects.create(**validated_data)
+
+    def __init__(self, *args, **kwargs):
+        super(ResolveSerializer, self).__init__(*args, **kwargs)
+        question = Question.objects.get(
+            pk=self.context.get('request').parser_context['kwargs']['pk']
+            )
+        self.fields['resolving_answer'].queryset = Answer.objects.filter(
+            question=question)
 
 
 class StarredItemSerializer(serializers.ModelSerializer):
@@ -83,13 +113,18 @@ class AnswerSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
+    resolved = serializers.PrimaryKeyRelatedField(read_only=True)
+    question_resolution_link = serializers.HyperlinkedIdentityField(
+        view_name='question-resolution'
+    )
     question_detail_link = serializers.HyperlinkedIdentityField(
         view_name='question-detail')
     answer_list_link = serializers.HyperlinkedIdentityField(
         view_name='question-answer-list')
     star_list_link = serializers.HyperlinkedIdentityField(
         view_name='question-star-list')
-    answer_count = serializers.IntegerField(source='answers.count', read_only=True)
+    answer_count = serializers.IntegerField(source='answers.count',
+                                            read_only=True)
     star_count = serializers.IntegerField(source='stars.count', read_only=True)
 
     class Meta:
@@ -100,9 +135,11 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'author',
                     'created_at',
                     'text',
+                    'resolved',
                     'answer_count',
                     'star_count',
                     'question_detail_link',
+                    'question_resolution_link',
                     'answer_list_link',
                     'star_list_link'
 

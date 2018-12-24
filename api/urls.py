@@ -36,10 +36,13 @@ urlpatterns = [
     path('questions/<pk>/stars/',
          api_views.QuestionStarList.as_view(),
          name='question-star-list'),
+    path('questions/<pk>/resolve/',
+         api_views.QuestionResolve.as_view(),
+         name='question-resolution'),
     path('answers/<pk>/',
          api_views.AnswerDetailView.as_view(),
          name='answer-detail'),
     path('answers/<pk>/stars/',
          api_views.AnswerStarList.as_view(),
-         name='answer-star-list'),
+         name='answer-star-list')
 ]
