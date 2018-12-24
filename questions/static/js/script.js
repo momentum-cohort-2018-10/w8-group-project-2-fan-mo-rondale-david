@@ -139,7 +139,7 @@ function postNewQuestion(){
 
 
 function loadQuestions(){
-    $.get('/api/questions')
+    $.get('/api/questions/')
       .then(function (questions) {
           for (let question of questions) {
               addQuestionToList(question)
@@ -191,16 +191,32 @@ var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEn
                     console.log("loading new items");
                 }
                 // ajax call to add content using function below
-                $.get("/api/questions/", addMore (10))
+                // $.ajax({
+                //     url: '/api/questions/',
+                //     method: 'GET',
+                //     data: JSON.stringify(question), 
+                //     contentType: 'application/json'})  
+                // $.get('/api/questions/')
+                // .then(function () {
+                        // loadQuestions()
+                        addMore(10)
+                        // scene.update();
+                        // $("#loader").removeClass("active")
                 }})
 
-function addMore (amount) {
-                    for (i=1; i <= amount; i++) {
-                        $("<div>How do I get new questions to load from database?</div>")
-                        .addClass("box question")
-                        .appendTo("#all-questions");
+
+function addMore(amount) {
+    console.log("in the addMore function")
+    for (let i=1; i<amount; i++) {
+        console.log(i)
+        // loadQuestions()
+        // console.log(loadQuestions())
+        $("<div>How do I get the question content to show up here?!</div>")
+            .addClass("box question")
+            .addClass("new")
+            .appendTo("#all-questions");
                     }
-                    scene.update();
-                    $("#loader").removeClass("active")}
+    // scene.update();
+    $("#loader").removeClass("active")}
 
 startQuestions()
