@@ -104,36 +104,36 @@ function addResolutionBlock(answer){
 
 function questionHTML(question){
     return `
-    <div class="box question">
-    <article class="media">
-        xs
-        <div class="media-content">
-            <div class="content">
-                <p>
-                    <small>${question.author}</small> <small>31m</small>
-                    <br>
-                    ${question.text}
-                </p>
-            </div>
-            <nav class="level is-mobile">
-                <div class="level-left">
-
-                    <a class="level-item" aria-label="reply">
-                        <span class="icon is-small">
-                            <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
-                        </span>
-                    </a>
-                    
-                    <a class="level-item" aria-label="like">
-                        <span class="icon is-small">
-                            <i class="fas fa-star fa-lg" aria-hidden="true"></i>
-                        </span>
-                    </a>
+    <div class="box question" data-question="${question.id}">
+        <article class="media">
+            <div class="media-content">
+                <div class="content">
+                    <h2>${question.title}</h2>
+                        <p class="box-information">
+                        <small>${question.author}</small> - <small>${question.created_at}</small>
+                        </p>
+                        ${question.text}
                 </div>
-            </nav>
-        </div>
-    </article>
-</div>
+                <nav class="level is-mobile">
+                    <div class="level-left question-controls">
+                        <a class="level-item" aria-label="reply">
+                            <span class="icon is-medium">
+                                <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                        <a class="level-item" aria-label="like">
+                            <span class="icon is-medium">
+                                    <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>
+                            </span>
+                        </a>
+                        <div>
+                            <p><strong>0 Answers</strong></p>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </article>
+    </div>
 `
 }
 
