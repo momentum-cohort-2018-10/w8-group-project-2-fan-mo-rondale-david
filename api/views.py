@@ -22,7 +22,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
 
-@api_view(['GET',])
+@api_view(['GET', ])
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
@@ -65,7 +65,7 @@ class UserQuestionListView(generics.ListCreateAPIView):
             user = get_object_or_404(User, username=username)
             return self.request.user.questions.all()
         # return Question.objects.filter(author=user.id)
-    
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -194,3 +194,6 @@ class AnswerStarList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         answer = Answer.objects.get(pk=self.kwargs['pk'])
         serializer.save(user=self.request.user, content_object=answer)
+
+
+"""minor change to add a commit"""
