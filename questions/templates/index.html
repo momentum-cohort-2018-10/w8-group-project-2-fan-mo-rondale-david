@@ -83,8 +83,9 @@
                         </div>
                     </nav>
                 </div>
-                {% if question.answers.all %}
                 <div class="answer-box">
+                        
+                
                 {% if question.resolved %}
                     {% for answer in question.answers.all %}
                         <div class="response {% if answer.id == question.resolved.resolving_answer.id %}resolution{% endif %}">
@@ -100,6 +101,19 @@
 
                     {% endfor %}
                 {% else %}
+                        <div class="response">
+                            <div class="field">
+
+                                <form action="">
+                                    <label class="label" for="text">Respond to Question</label>
+                                    <textarea name="text" cols="30" rows="10" data-question="{{question.id}}" class="textarea"></textarea>
+                                </form>
+                            </div>
+                            <div class="control">
+                                <button class="button is-link submit-answer" data-question="{{question.id}}">Submit</button>
+                            </div>
+                        </div>
+                        
                     {% for answer in question.answers.all %}
 
                         <div class="response">
@@ -123,7 +137,6 @@
                 {% endif %}
 
                 </div>
-                {% endif %}
             </article>
         </div>
         {% empty %}

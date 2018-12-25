@@ -9,6 +9,9 @@ function init() {
         check.addEventListener('click', resolveQuestion);
     });
 
+    document.querySelectorAll('.submit-answer').forEach(function(button){
+        button.addEventListener('click', submitAnswer);
+    });
 }
 init()
 
@@ -99,6 +102,52 @@ function removeResolveButtons(question){
 function addResolutionBlock(answer){
     let response = document.querySelector(`a[data-answer="${answer}"]`);
     response.parentNode.parentNode.classList.add('resolution')
+}
+
+
+function answerHTML(answer) {
+    questionAuthor = document.querySelector(
+        `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
+    return `
+    <div class="response">
+        <p>
+            <small>${answer.author}</small> - <small>${answer.created_at}</small>
+            <br>
+            ${answer.text}
+            ${answer.author === questionAuthor ? `<div class="answer-controls">
+            <a class="button is-outlined is-small check" data-question="${answer.question}" data-answer="${answer.id}">
+                <i class="fas fa-check"></i> &nbsp; Mark as Resolved
+            </a>
+            </div>` : ''}    
+        </p>
+    </div>
+`
+}
+
+function submitAnswer() {
+    pk = this.attributes['data-question'].value;
+    textarea = document.querySelector(`textarea[data-question='${pk}']`);
+
+    $.ajax({
+        method: 'POST',
+        url: `/api/questions/${pk}/answers/`,
+        data: {
+            text: textarea.value
+        }
+    }).done(function(response){
+        console.log(response);
+        textarea.value = "";
+        addAnswer(response);
+    }).fail(function(response){
+        console.log('There was an issue submitting this answer.');
+        console.log(response);
+    })
+
+}
+
+function addAnswer(answer) {
+    textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
+    textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
 
 
