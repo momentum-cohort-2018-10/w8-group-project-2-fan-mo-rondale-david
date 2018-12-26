@@ -267,10 +267,13 @@ var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEn
 
 function loadTenQuestions() {
     let lastQuestion = document.querySelector('section#question-list').lastElementChild.getAttribute('data-question');
-    lastQuestion = 1
+    // lastQuestion = 1
     for (let i=1; i<11; i++) {
         let nextQuestion = lastQuestion-i;
-        if (nextQuestion < 0) {
+        console.log(lastQuestion)
+        console.log(i)
+        console.log(nextQuestion)
+        if (nextQuestion < 51) {
             $('#loader').remove();
             
             
@@ -280,6 +283,7 @@ function loadTenQuestions() {
         }
         catch(error) {
             console.log(error);
+            
         }
     }
     
