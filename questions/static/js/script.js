@@ -1,115 +1,65 @@
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+function init() {
+    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
+    document.getElementById('close-modal').addEventListener('click', toggleModal);
+    document.getElementById('modal-background').addEventListener('click', toggleModal);
+    document.querySelectorAll('.question-controls i').forEach(function(star){
+        star.addEventListener('click', starHandler);
+    });
+    document.querySelectorAll('.answer-controls .check').forEach(function(check){
+        check.addEventListener('click', resolveQuestion);
+    });
 
-let csrftoken = getCookie('csrftoken');
+    document.querySelectorAll('.submit-answer').forEach(function(button){
+        button.addEventListener('click', submitAnswer);
+    });
+}
+init()
 
 function toggleNavBar(){
     this.classList.toggle('is-active');
     document.querySelector('.navbar-menu').classList.toggle('is-active');
 }
-function toggleModal(){
-    modal.classList.toggle('is-active');
+
+
+function starHandler() {
+    console.log(this);
+    if (this.attributes['data-star']) {
+        pk = this.attributes['data-star'].value;
+        unstarItem(pk);
+    } else {
+        pk = this.attributes['data-question'].value;
+        starItem(pk);
+    }
 }
 
-function questionHTML(question){
-    return `
-    <div class="box question">
-    <article class="media">
-        
-        <div class="media-content">
-            <div class="content">
-                <p>
-                    <small>${question.author}</small> <small>31m</small>
-                    <br>
-                    ${question.text}
-                </p>
-            </div>
-            <nav class="level is-mobile">
-                <div class="level-left">
-
-                    <a class="level-item" aria-label="reply">
-                        <span class="icon is-small">
-                            <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
-                        </span>
-                    </a>
-                    
-                    <a class="level-item" aria-label="like">
-                        <span class="icon is-small">
-                            <i class="fas fa-star fa-lg" aria-hidden="true"></i>
-                        </span>
-                    </a>
-                </div>
-            </nav>
-        </div>
-    </article>
-</div>
-`
-}
-
-
-function init() {
-    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
-    // click button to ask a question, opens modal with form
-    document.getElementById('ask-question').addEventListener('click', toggleModal);
-    document.getElementById('close-modal').addEventListener('click', toggleModal);
-    document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
-        star.addEventListener('click', starItem);
-    });
-    document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
-    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
-
-}
-
-
-init()
-
-function starItem(){
-    pk = this.attributes['data-question'].value;
+function starItem(pk){
+    
     $.ajax({
         method: 'POST',
-        url: `api/questions/${pk}/stars/`,
-        data: {
-            csrfmiddlewaretoken: csrftoken,
-        }
+        url: `api/questions/${pk}/stars/`
     }).done(function(response) {
         star = document.querySelector(`i[data-question='${response.object_id}']`);
+        star.setAttribute('data-star', response.pk);
+        star.addEventListener('click', unstarItem);
         toggleStar(star);
         console.log(response);
     }).fail(function(response) {
-        console.log("There was an error");
+        console.log("There was an error making the star");
         console.log(response);
     });
 }
 
-function unstarItem(){
-    pk = this.attributes['data-question'].value;
+function unstarItem(pk){
+    
     $.ajax({
         method: 'DELETE',
-        url: `api/questions/${pk}/stars/`,
-        data: {
-            csrfmiddlewaretoken: csrftoken,
-        }
+        url: `api/stars/${pk}/`,
+        dataType: 'text'
     }).done(function(response) {
-        star = document.querySelector(`i[data-question='${response.object_id}']`);
+        star = document.querySelector(`i[data-star='${pk}']`);
+        star.removeAttribute('data-star');
         toggleStar(star);
-        console.log(response);
-    }).fail(function(response) {
-        console.log("There was an error");
-        console.log(response);
+        
     });
 }
 
@@ -119,6 +69,117 @@ function toggleStar(icon){
 
 }
 
+
+function resolveQuestion(){
+    pk = this.attributes['data-question'].value;
+    answer = this.attributes['data-answer'].value;
+    console.log(pk, answer);
+    $.ajax({
+        method: 'POST',
+        url: `/api/questions/${pk}/resolve/`,
+        data: {
+            resolving_answer: answer
+        }
+    }).done(function(response){
+        addResolutionBlock(response.resolving_answer);
+        removeResolveButtons(response.resolved_question);
+        
+        console.log(response);
+    }).fail(function(response){
+        console.log('There was an error resolving this question');
+        console.log(response);
+    });
+}
+
+function removeResolveButtons(question){
+    let questionBlock = document.querySelector(`div[data-question="${question}"]`);
+    
+    questionBlock.querySelectorAll('a.check').forEach(function(button){
+        button.parentNode.innerHTML = "";
+    });
+}
+
+function addResolutionBlock(answer){
+    let response = document.querySelector(`a[data-answer="${answer}"]`);
+    response.parentNode.parentNode.classList.add('resolution')
+}
+
+
+function answerHTML(answer) {
+    questionAuthor = document.querySelector(
+        `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
+    return `
+    <div class="response">
+        <p>
+            <small>${answer.author}</small> - <small>${answer.created_at}</small>
+            <br>
+            ${answer.text}
+            ${answer.author === questionAuthor ? `<div class="answer-controls">
+            <a class="button is-outlined is-small check" data-question="${answer.question}" data-answer="${answer.id}">
+                <i class="fas fa-check"></i> &nbsp; Mark as Resolved
+            </a>
+            </div>` : ''}    
+        </p>
+    </div>
+`
+}
+
+function submitAnswer() {
+    pk = this.attributes['data-question'].value;
+    textarea = document.querySelector(`textarea[data-question='${pk}']`);
+
+    $.ajax({
+        method: 'POST',
+        url: `/api/questions/${pk}/answers/`,
+        data: {
+            text: textarea.value
+        }
+    }).done(function(response){
+        console.log(response);
+        textarea.value = "";
+        addAnswer(response);
+    }).fail(function(response){
+        console.log('There was an issue submitting this answer.');
+        console.log(response);
+    })
+
+}
+
+function addAnswer(answer) {
+    textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
+    textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
+}
+
+
+function questionHTML(question){
+    return `
+    <div class="box question" data-question="${question.id}">
+        <article class="media">
+            <div class="media-content">
+                <div class="content">
+                    <h2>${question.title}</h2>
+                        <p class="box-information">
+                        <small>${question.author}</small> - <small>${question.created_at}</small>
+                        </p>
+                        ${question.text}
+                </div>
+                <nav class="level is-mobile">
+                    <div class="level-left question-controls">
+                        <a class="level-item" aria-label="like">
+                            <span class="icon is-medium">
+                                    <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>
+                            </span>
+                        </a>
+                        <div>
+                            <p><strong>0 Answers</strong></p>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </article>
+    </div>
+`
+}
 
 function postNewQuestion(){
     let question = {
@@ -131,25 +192,39 @@ function postNewQuestion(){
         data: JSON.stringify(question), 
         contentType: 'application/json'
     }).then(function (question) {
+        console.log(question);
         addQuestionToList(question)
-        $('#ask-question').removeClass('is-active')
-        modal.style.display = "none"
-    })
+        toggleModal();
+    });
 }
 
 
 function loadQuestions(){
     $.get('/api/questions/')
       .then(function (questions) {
-          for (let question of questions) {
-              addQuestionToList(question)
-          }
+        //   for (let question of questions) {
+        //       addQuestionToList(question)
+        //   }
       })
 }
 
-
 function addQuestionToList(question){
-    $('question-list').append(questionHTML(question))
+    document.getElementById('question-list').insertAdjacentHTML('afterbegin', questionHTML(question));
+    document.querySelector('.question-controls i').addEventListener('click', starHandler);
+}
+
+function startQuestions() {
+    // click button to ask a question, opens modal with form
+    document.getElementById('ask-question').addEventListener('click', toggleModal);
+    document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
+    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
+    loadQuestions()
+    setupCSRFAjax()
+}
+startQuestions()
+
+function toggleModal(){
+    modal.classList.toggle('is-active');
 }
 
 function setupCSRFAjax () {
@@ -162,11 +237,6 @@ function setupCSRFAjax () {
         }
       }
     })
-  }
-
-function startQuestions() {
-    loadQuestions()
-    setupCSRFAjax()
 }
 
 function csrfSafeMethod(method){
