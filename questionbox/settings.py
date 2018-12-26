@@ -24,6 +24,7 @@ SECRET_KEY = '73=bk=^!bhkjd5$qv#76w20y(xfxwe$@2(!!2hui+6(c_it8^c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+INTERNAL_IPS = '127.0.0.1'
 
 ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'questions.User'
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'registration',
     'rest_framework',
     'django_extensions',
+    'debug_toolbar',
 
     # DJANGO
     'django.contrib.admin',
@@ -64,6 +66,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,6 +74,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'questionbox.urls'

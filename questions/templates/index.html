@@ -57,7 +57,7 @@
                     <div class="content">
                         <h2>{{ question.title }}</h2>
                             <p class="box-information">
-                            <small>{{ question.author }}</small> - <small>{{ question.created_at }}</small>
+                            <small>{{ question.author_name }}</small> - <small>{{ question.created_at }}</small>
                             </p>
 
                             {{ question.text }}
@@ -90,11 +90,15 @@
                     {% for answer in question.answers.all %}
                         <div class="response {% if answer.id == question.resolved.resolving_answer.id %}resolution{% endif %}">
                             <p>
-                                <small>{{ answer.author }}</small> - <small>{{ answer.created_at }}</small>
+                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
                                 <br>
-                                {{ answer.text }}
+                                <p>{{ answer.text }}</p>
                                 <div class="answer-controls">
-
+                                    {% if answer.star %}
+                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% endif %}
                                 </div>
                             </p>
                         </div>
@@ -118,16 +122,25 @@
 
                         <div class="response">
                             <p>
-                                <small>{{ answer.author }}</small> - <small>{{ answer.created_at }}</small>
+                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
                                 <br>
-                                {{ answer.text }}
-                                {% if user.id == question.author.id %}
-                                    <div class="answer-controls">
-                                        <a class="button is-outlined is-small check" data-question="{{question.id}}" data-answer="{{answer.id}}">
-                                            <i class="fas fa-check"></i> &nbsp; Mark as Resolved
-                                        </a>
-                                    </div>
-                                {% endif %}
+                                <p>{{ answer.text }}</p>
+                                
+                                <div class="answer-controls">
+                                    {% if answer.star %}
+                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% endif %}
+                                    
+
+                                    {% if user.id == question.author_id %}
+                                    <a class="button is-outlined is-small check" data-question="{{question.id}}" data-answer="{{answer.id}}">
+                                        <i class="fas fa-check"></i> &nbsp; Mark as Resolved
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                
 
                             </p>
                         </div>

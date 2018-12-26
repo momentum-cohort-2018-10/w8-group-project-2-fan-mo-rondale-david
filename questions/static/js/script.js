@@ -73,7 +73,7 @@ function toggleStar(icon){
 function resolveQuestion(){
     pk = this.attributes['data-question'].value;
     answer = this.attributes['data-answer'].value;
-
+    console.log(pk, answer);
     $.ajax({
         method: 'POST',
         url: `/api/questions/${pk}/resolve/`,
