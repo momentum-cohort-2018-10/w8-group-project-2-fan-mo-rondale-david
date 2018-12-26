@@ -12,6 +12,9 @@ function init() {
     document.querySelectorAll('.submit-answer').forEach(function(button){
         button.addEventListener('click', submitAnswer);
     });
+    document.querySelectorAll('.box.question').forEach(function(question) {
+        question.addEventListener('click', loadAnswers);
+    })
 }
 init()
 
@@ -24,10 +27,10 @@ function toggleNavBar(){
 function starHandler() {
     console.log(this);
     if (this.attributes['data-star']) {
-        pk = this.attributes['data-star'].value;
+        let pk = this.attributes['data-star'].value;
         unstarItem(pk);
     } else {
-        pk = this.attributes['data-question'].value;
+        let pk = this.attributes['data-question'].value;
         starItem(pk);
     }
 }
@@ -38,7 +41,7 @@ function starItem(pk){
         method: 'POST',
         url: `api/questions/${pk}/stars/`
     }).done(function(response) {
-        star = document.querySelector(`i[data-question='${response.object_id}']`);
+        let star = document.querySelector(`i[data-question='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
         star.addEventListener('click', unstarItem);
         toggleStar(star);
@@ -56,7 +59,7 @@ function unstarItem(pk){
         url: `api/stars/${pk}/`,
         dataType: 'text'
     }).done(function(response) {
-        star = document.querySelector(`i[data-star='${pk}']`);
+        let star = document.querySelector(`i[data-star='${pk}']`);
         star.removeAttribute('data-star');
         toggleStar(star);
         
@@ -71,8 +74,8 @@ function toggleStar(icon){
 
 
 function resolveQuestion(){
-    pk = this.attributes['data-question'].value;
-    answer = this.attributes['data-answer'].value;
+    let pk = this.attributes['data-question'].value;
+    let answer = this.attributes['data-answer'].value;
     console.log(pk, answer);
     $.ajax({
         method: 'POST',
@@ -106,7 +109,7 @@ function addResolutionBlock(answer){
 
 
 function answerHTML(answer) {
-    questionAuthor = document.querySelector(
+    let questionAuthor = document.querySelector(
         `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
     return `
     <div class="response">
@@ -125,8 +128,8 @@ function answerHTML(answer) {
 }
 
 function submitAnswer() {
-    pk = this.attributes['data-question'].value;
-    textarea = document.querySelector(`textarea[data-question='${pk}']`);
+    let pk = this.attributes['data-question'].value;
+    let textarea = document.querySelector(`textarea[data-question='${pk}']`);
 
     $.ajax({
         method: 'POST',
@@ -146,8 +149,37 @@ function submitAnswer() {
 }
 
 function addAnswer(answer) {
-    textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
+    let textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
     textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
+}
+
+function loadAnswers() {
+    let pk = this.getAttribute('data-question');
+    $.ajax({
+        method: 'GET',
+        url: `/api/questions/${pk}/answers/`,
+    }).done(function(response){
+        loadAnswersInDom(response);
+    }).fail(function(error){
+        console.log('There was an issue getting a response');
+        console.log(error);
+    })
+}
+
+function loadAnswersInDom(answers) {
+    if (answers[0]) {
+        console.log(answers[0].question);
+        let answerArea = document.querySelector(`.box.question[data-question='${answers[0].question}'] .answer-box`);
+        for (answer of answers) {
+            answerArea.insertAdjacentHTML('beforeend', answerHTML(answer));
+        }
+        
+        
+    }
+    
+    
+    // let answerArea = document.querySelector(`textarea[data-question='${answer.question}']`);
+    // textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
 
 
