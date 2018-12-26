@@ -60,11 +60,8 @@ class UserQuestionListView(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        if self.kwargs.get('username'):
-            username = self.kwargs['username']
-            user = get_object_or_404(User, username=username)
-            return self.request.user.questions.all()
-        # return Question.objects.filter(author=user.id)
+        user = self.request.user
+        return Question.objects.filter(author=user)
     
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)

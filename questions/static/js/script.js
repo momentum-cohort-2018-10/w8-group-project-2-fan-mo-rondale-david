@@ -63,15 +63,15 @@ function questionHTML(question){
 function init() {
     document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
     // click button to ask a question, opens modal with form
-    document.getElementById('ask-question').addEventListener('click', toggleModal);
-    document.getElementById('close-modal').addEventListener('click', toggleModal);
-    document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
-        star.addEventListener('click', starItem);
-    });
-    document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
-    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
-
+    // document.getElementById('ask-question').addEventListener('click', toggleModal);
+    // document.getElementById('close-modal').addEventListener('click', toggleModal);
+    // document.getElementById('modal-background').addEventListener('click', toggleModal);
+    // document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
+    //     star.addEventListener('click', starItem);
+    // });
+    // document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
+    // document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
+    document.querySelector("li[data-target='pane-2']").addEventListener('click', getUserQuestions);
 }
 
 
@@ -167,6 +167,21 @@ function setupCSRFAjax () {
 function startQuestions() {
     loadQuestions()
     setupCSRFAjax()
+}
+
+function getUserQuestions() {
+    console.log(this);
+    $.ajax({
+        method: 'GET', 
+        url: "/api/my-questions/"
+    }).done(function(response){
+        console.log(response);
+        document.querySelector('.tile.is-child.box').innerHTML = "";
+        
+    }).fail(function(response){
+        console.log("There was an issue gettting the user's questions.");
+        console.log(response);
+    })
 }
 
 function csrfSafeMethod(method){

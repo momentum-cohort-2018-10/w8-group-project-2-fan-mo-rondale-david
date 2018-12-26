@@ -76,10 +76,10 @@ def question_starred_list(request):
     }
     return render(request, 'profile/question_starred_list.html', context)
 
-def starred_question(request, id):                                      #Name of the view in the url
-    question = get_object_or_404(Question, id=id)                       #Get the user's starred items by id
-    if question.starred.filter(id=request.user.id).exists():              #If any starred items exists
-        question.starred.remove(request.user)                             #Remove the current user from the db
+def starred_question(request, id):                                      
+    question = get_object_or_404(Question, id=id)                       
+    if question.starred.filter(id=request.user.id).exists():              
+        question.starred.remove(request.user)                             
     else:        
-        question.starred.add(request.user)                                #Add current user to db
-    return HttpResponseRedirect(question.get_absolute_url())            #Display those starred items from the database
+        question.starred.add(request.user)                                
+    return HttpResponseRedirect(question.get_absolute_url())            
