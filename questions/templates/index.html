@@ -5,9 +5,13 @@
 {% endblock title %}
 
 {% block content %}
-    <h1>Hello & welcome!</h1>
-    <p>Got a question? Let's get you an answer!</p>
-    <button id='ask-question' class='button is-primary'>Ask A ¿Question?</button>
+    <div class="welcome">
+        <h1>Hello & welcome!</h1>
+        <p>Got a question? Let's get you an answer!</p>
+        <button id='ask-question' class='button is-primary'>Ask A ¿Question?</button>
+    
+    </div>
+    
 
     <div id='modal' class="modal">
         <div id='modal-background' class="modal-background"></div>
@@ -42,66 +46,114 @@
         </div>
             
     </div>
-    {% for question in object_list %}
-    
+    <section id="question-list">
 
-    <div class="box question">
-        <article class="media">
-            
-            <div class="media-content">
-                <div class="content">
-                    <h2>{{ question.title }}</h2>
-                        <p class="box-information">
-                        <small>{{ question.author }}</small> - <small>{{ question.created_at }}</small>
-                        </p>
+        {% for question in object_list %}
 
-                        {{ question.text }}
+        <div class="box question" data-question="{{ question.id }}">
+            <article class="media">
+
+                <div class="media-content">
+                    <div class="content">
+                        <h2>{{ question.title }}</h2>
+                            <p class="box-information">
+                            <small>{{ question.author_name }}</small> - <small>{{ question.created_at }}</small>
+                            </p>
+
+                            {{ question.text }}
+
+                    </div>
+                    <nav class="level is-mobile">
+                        <div class="level-left question-controls">
+
+                            <a class="level-item" aria-label="like">
+                                <span class="icon is-medium">
+
+                                    {% if question.star %}
+                                        <i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="{{ question.id }}" data-star="{{ question.star }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="{{ question.id }}"></i>
+                                    {% endif %}
+
+                                </span>
+                            </a>
+                            <div>
+                                <p><strong>{{ question.answers.count }} Answer{{ question.answers.count|pluralize }}</strong></p>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+                <div class="answer-box">
+                        
+                
+                {% if question.resolved %}
+                    {% for answer in question.answers.all %}
+                        <div class="response {% if answer.id == question.resolved.resolving_answer.id %}resolution{% endif %}">
+                            <p>
+                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
+                                <br>
+                                <p>{{ answer.text }}</p>
+                                <div class="answer-controls">
+                                    {% if answer.star %}
+                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% endif %}
+                                </div>
+                            </p>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                        <div class="response">
+                            <div class="field">
+
+                                <form action="">
+                                    <label class="label" for="text">Respond to Question</label>
+                                    <textarea name="text" cols="30" rows="10" data-question="{{question.id}}" class="textarea"></textarea>
+                                </form>
+                            </div>
+                            <div class="control">
+                                <button class="button is-link submit-answer" data-question="{{question.id}}">Submit</button>
+                            </div>
+                        </div>
+                        
+                    {% for answer in question.answers.all %}
+
+                        <div class="response">
+                            <p>
+                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
+                                <br>
+                                <p>{{ answer.text }}</p>
+                                
+                                <div class="answer-controls">
+                                    {% if answer.star %}
+                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% else %}
+                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
+                                    {% endif %}
+                                    
+
+                                    {% if user.id == question.author_id %}
+                                    <a class="button is-outlined is-small check" data-question="{{question.id}}" data-answer="{{answer.id}}">
+                                        <i class="fas fa-check"></i> &nbsp; Mark as Resolved
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                
+
+                            </p>
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
 
                 </div>
-                <nav class="level is-mobile">
-                    <div class="level-left question-controls">
-
-                        <a class="level-item" aria-label="reply">
-                            <span class="icon is-small">
-                                <i class="fas fa-reply fa-lg" aria-hidden="true"></i>
-                            </span>
-                        </a>
-                        
-                        <a class="level-item" aria-label="like">
-                            <span class="icon is-small">
-                                
-                                {% if question.star %}
-                                    <i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="{{ question.id }}"></i>
-                                {% else %}
-                                    <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="{{ question.id }}"></i>
-                                {% endif %}
-
-                            </span>
-                        </a>
-                        <div>
-                            <p><strong>{{ question.answers.count }} Answer{{ question.answers.count|pluralize }}</strong></p>
-                        </div>
-                    </div>
-                </nav>
-            </div>
-            {% if question.answers.all %}
-            <div class="answer-box">
-                {% for answer in question.answers.all %}
-                    <div class="response">
-                        <p>
-                            <small>{{ answer.author }}</small> - <small>{{ answer.created_at }}</small>
-                            <br>
-                            {{ answer.text }}
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                        </p>
-                    </div>
-
-                {% endfor %}
-            </div>
-            {% endif %}
-        </article>
-    </div>
-    {% empty %}
-        <p>No questions yet!</p>
-    {% endfor %}
+            </article>
+        </div>
+        {% empty %}
+            <p>No questions yet!</p>
+        {% endfor %}
+    </section>
 {% endblock content %}

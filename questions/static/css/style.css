@@ -12,7 +12,12 @@ header {
     text-align: center;
     color: #f5f5f5;
 }
-
+.welcome {
+    text-align: center;
+}
+.welcome p {
+    margin-bottom: 20px;
+}
 .box.question {
     margin: 40px auto;
     max-width: 960px;
@@ -27,20 +32,32 @@ p.box-information {
     flex-wrap: wrap;
 }
 .box.question .media-content {
+    width: 100%;
     padding-bottom: 30px;
     border-bottom: 1px solid lightblue;
 }
 .box.question .answer-box {
-    margin: 30px auto;
     padding: 15px 0 15px 30px;
-    border-radius: 5px;
-    background-color: azure;
+    border-radius: 5px;   
+    width: 100%;
 }
 
 .box.question .answer-box .response {
     padding-left: 10px;
     border-left: 3px solid green;
-    margin: 10px 0;
+    margin: 20px 0;
+    background-color: azure;
+}
+.box.question .answer-box .response.resolution {
+    background-color: #c9ffff;
+}
+.response form input {
+    display: block;
+}
+.response form textarea[rows] {
+    width: 100%;
+    resize: none;
+    height: 120px;
 }
 i.starred {
     color: #fff000;
