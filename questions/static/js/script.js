@@ -1,3 +1,8 @@
+// Global run execution
+let csrftoken = getCookie('csrftoken');
+// init()
+// startQuestions()
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -14,17 +19,15 @@ function getCookie(name) {
     return cookieValue;
 }
 
-let csrftoken = getCookie('csrftoken');
-
-function toggleNavBar(){
+function toggleNavBar() {
     this.classList.toggle('is-active');
     document.querySelector('.navbar-menu').classList.toggle('is-active');
 }
-function toggleModal(){
+function toggleModal() {
     modal.classList.toggle('is-active');
 }
 
-function questionHTML(question){
+function questionHTML(question) {
     return `
     <div class="box question">
     <article class="media">
@@ -66,18 +69,18 @@ function init() {
     document.getElementById('ask-question').addEventListener('click', toggleModal);
     document.getElementById('close-modal').addEventListener('click', toggleModal);
     document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
-        star.addEventListener('click', starItem);
-    });
+
+    // The page will not initially have .question-controls elements, therefore this won't do
+    // anything at init time. Move to separate function to be run after question population.
+    // document.querySelectorAll('.question-controls .unstarred').forEach(function (star) {
+    //     star.addEventListener('click', starItem);
+    // });
     document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
     document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
 
 }
 
-
-init()
-
-function starItem(){
+function starItem() {
     pk = this.attributes['data-question'].value;
     $.ajax({
         method: 'POST',
@@ -85,17 +88,17 @@ function starItem(){
         data: {
             csrfmiddlewaretoken: csrftoken,
         }
-    }).done(function(response) {
+    }).done(function (response) {
         star = document.querySelector(`i[data-question='${response.object_id}']`);
         toggleStar(star);
         console.log(response);
-    }).fail(function(response) {
+    }).fail(function (response) {
         console.log("There was an error");
         console.log(response);
     });
 }
 
-function unstarItem(){
+function unstarItem() {
     pk = this.attributes['data-question'].value;
     $.ajax({
         method: 'DELETE',
@@ -103,24 +106,24 @@ function unstarItem(){
         data: {
             csrfmiddlewaretoken: csrftoken,
         }
-    }).done(function(response) {
+    }).done(function (response) {
         star = document.querySelector(`i[data-question='${response.object_id}']`);
         toggleStar(star);
         console.log(response);
-    }).fail(function(response) {
+    }).fail(function (response) {
         console.log("There was an error");
         console.log(response);
     });
 }
 
-function toggleStar(icon){
+function toggleStar(icon) {
     icon.classList.toggle('unstarred');
     icon.classList.toggle('starred');
 
 }
 
 
-function postNewQuestion(){
+function postNewQuestion() {
     let question = {
         title: $('#new-question-title').val(),
         text: $('#new-question-text').val()
@@ -128,7 +131,7 @@ function postNewQuestion(){
     $.ajax({
         url: '/api/questions/',
         method: 'POST',
-        data: JSON.stringify(question), 
+        data: JSON.stringify(question),
         contentType: 'application/json'
     }).then(function (question) {
         addQuestionToList(question)
@@ -138,40 +141,40 @@ function postNewQuestion(){
 }
 
 
-function loadQuestions(){
+function loadQuestions() {
     $.get('/api/questions')
-      .then(function (questions) {
-          for (let question of questions) {
-              addQuestionToList(question)
-          }
-      })
+        .then(function (questions) {
+            for (let question of questions) {
+                addQuestionToList(question)
+            }
+        })
 }
 
 
-function addQuestionToList(question){
+function addQuestionToList(question) {
     $('question-list').append(questionHTML(question))
 }
 
-function setupCSRFAjax () {
+function setupCSRFAjax() {
     var csrftoken = Cookies.get('csrftoken')
-  
+
     $.ajaxSetup({
-      beforeSend: function (xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-          xhr.setRequestHeader('X-CSRFToken', csrftoken)
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader('X-CSRFToken', csrftoken)
+            }
         }
-      }
     })
-  }
+}
 
 function startQuestions() {
     loadQuestions()
     setupCSRFAjax()
 }
 
-function csrfSafeMethod(method){
-// these HTTP methods do not require CSRF protection
-return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
 }
 
 startQuestions()

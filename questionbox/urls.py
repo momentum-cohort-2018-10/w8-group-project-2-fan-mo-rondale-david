@@ -23,7 +23,8 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', views.QuestionListView.as_view(), name='home'),
+    #path('', views.QuestionListView.as_view(), name='home'),
+    path('', views.main, name='home'),
     path('api/', include(api_urls)),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),

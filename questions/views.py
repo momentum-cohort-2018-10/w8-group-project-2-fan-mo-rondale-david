@@ -18,12 +18,16 @@ class QuestionListView(ListView):
                 'from questions_question q LEFT JOIN '
                 '(SELECT * FROM questions_starreditem '
                 'WHERE content_type_id = 8 and user_id = %s) '
-                's ON q.id = s.object_id', (user_id,)
-                ).prefetch_related('answers')
+                's ON q.id = s.object_id',
+                (user_id, )).prefetch_related('answers')
 
         else:
             queryset = Question.objects.all().prefetch_related('answers')
         return queryset
+
+
+def main(request):
+    return render(request, 'main.html')
 
 
 @login_required
@@ -34,7 +38,7 @@ def profile(request):
 def edit_profile(request):
     if request.method == 'POST':
         form = EditProfileForm(request.POST, instance=request.user)
-        
+
         if form.is_valid():
             form.save()
             return redirect('profile')
@@ -47,7 +51,7 @@ def edit_profile(request):
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(data=request.POST, user=request.user)
-        
+
         if form.is_valid():
             form.save()
             return redirect('profile')
@@ -56,6 +60,6 @@ def change_password(request):
 
     else:
         form = PasswordChangeForm(user=request.user)
-        
+
         args = {'form': form}
         return render(request, 'registration/change_password.html', args)
