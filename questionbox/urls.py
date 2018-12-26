@@ -20,6 +20,7 @@ from questions import views as questions_views
 from api import urls as api_urls
 from django.conf import settings
 from django.conf.urls.static import static
+from questions.backends import CustomRegistrationView
 
 
 urlpatterns = [
@@ -27,17 +28,23 @@ urlpatterns = [
     path('api/', include(api_urls)),
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
-    path('accounts/profile/',
-         views.QuestionListView.as_view(),
-         name='account_home'),
+    path('accounts/register',
+         CustomRegistrationView.as_view(),
+         name='registration'),
     path('userprofile/', questions_views.profile, name='profile'),
-    path('userprofile/edit/', questions_views.edit_profile, name='edit_profile'),
-    path('userprofile/change-password/', questions_views.change_password, name='change_password'),
-
-    path('starred_question/', questions_views.starred_question, name='starred_question'),
-    path('userprofile/starred/', questions_views.question_starred_list, name='question_starred_list'),
+    path('userprofile/edit/',
+         questions_views.edit_profile,
+         name='edit_profile'),
+    path('change-password/',
+         questions_views.change_password,
+         name='change_password'),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
+
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

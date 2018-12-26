@@ -2,9 +2,10 @@ from api.serializers import (
     UserSerializer,
     StarredItemSerializer,
     QuestionSerializer,
-    AnswerSerializer
+    AnswerSerializer,
+    ResolveSerializer
 )
-from questions.models import User, StarredItem, Question, Answer
+from questions.models import User, StarredItem, Question, Answer, Resolve
 from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -12,14 +13,14 @@ from rest_framework.decorators import api_view
 from api.permissions import (
     IsAuthorOrReadOnly,
     IsStarOwnerOrReadOnly,
-    IsAnswerOwnerOrReadOnly
+    IsAnswerOwnerOrReadOnly,
+    OnlyAuthorCanMarkResolved
 )
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
     IsAuthenticated
 )
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import get_object_or_404
 
 
 @api_view(['GET',])
@@ -52,7 +53,7 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-class UserQuestionListView(generics.ListCreateAPIView):
+class UserQuestionListView(generics.ListAPIView):
     """
     Retrieves author's list of questions
     """
@@ -62,9 +63,6 @@ class UserQuestionListView(generics.ListCreateAPIView):
     def get_queryset(self):
         user = self.request.user
         return Question.objects.filter(author=user)
-    
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
 
 
 class UserAnswerListView(generics.ListAPIView):
@@ -76,20 +74,7 @@ class UserAnswerListView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Answer.objects.filter(author=user.id)
-
-
-class StarredItemList(generics.ListCreateAPIView):
-    """
-    Retrieves list of starred items
-    TODO = make it specific for a logged in user
-    """
-    queryset = StarredItem.objects.all()
-    serializer_class = StarredItemSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        return Answer.objects.filter(author=user)
 
 
 class StarredItemDetail(generics.RetrieveDestroyAPIView):
@@ -131,7 +116,6 @@ class QuestionsByUserListView(generics.ListAPIView):
     Retrieves list of questions by selected user
     """
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -143,15 +127,29 @@ class AnswersByUserListView(generics.ListAPIView):
     """
     Retrieves list of answers by selected user
     """
+    serializer_class = AnswerSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        user = User.objects.get(pk=pk)
+        return Answer.objects.filter(author=user)
 
 
 class AnswerDetailView(generics.RetrieveDestroyAPIView):
+    """
+    Retrieves details for a specific answer
+    Allows answer owners to delete
+    """
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsAnswerOwnerOrReadOnly)
 
 
 class QuestionAnswerList(generics.ListCreateAPIView):
+    """
+    Lists answers for a specific question
+    Allows logged in users to post an answer
+    """
     serializer_class = AnswerSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
@@ -165,7 +163,10 @@ class QuestionAnswerList(generics.ListCreateAPIView):
 
 
 class QuestionStarList(generics.ListCreateAPIView):
-
+    """
+    Lists star instances for a specific question
+    Allows logged in users to add a star
+    """
     serializer_class = StarredItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
@@ -179,7 +180,28 @@ class QuestionStarList(generics.ListCreateAPIView):
         serializer.save(user=self.request.user, content_object=question)
 
 
+class QuestionResolve(generics.ListCreateAPIView):
+    """
+    Displays resolution for a question
+    Allows question owner to choose a correct answer
+    """
+    serializer_class = ResolveSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, OnlyAuthorCanMarkResolved)
+
+    def get_queryset(self):
+        question = Question.objects.get(pk=self.kwargs['pk'])
+        return Resolve.objects.filter(resolved_question=question)
+
+    def perform_create(self, serializer):
+        question = Question.objects.get(pk=self.kwargs['pk'])
+        serializer.save(resolved_question=question)
+
+
 class AnswerStarList(generics.ListCreateAPIView):
+    """
+    Retrieves list of stars for an answer
+    Allows logged in users to star an answer
+    """
     serializer_class = StarredItemSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
