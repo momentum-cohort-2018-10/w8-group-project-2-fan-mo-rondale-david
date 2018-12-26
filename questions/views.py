@@ -23,7 +23,8 @@ class QuestionListView(ListView):
                 'WHERE content_type_id = %s and user_id = %s) '
                 's ON q.id = s.object_id '
                 'LEFT JOIN (SELECT u.id, u.username from questions_user u) '
-                'u on q.author_id = u.id', (
+                'u on q.author_id = u.id '
+                'ORDER BY q.created_at DESC', (
                     question,
                     user_id
                     )).prefetch_related('answers').prefetch_related('resolved')

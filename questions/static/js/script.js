@@ -257,36 +257,55 @@ var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEn
         .on("enter", function (e) {
             if (!$("#loader").hasClass("active")) {
                 $("#loader").addClass("active");
-                if (console){
-                    console.log("loading new items");
-                }
-                // ajax call to add content using function below
-                // $.ajax({
-                //     url: '/api/questions/',
-                //     method: 'GET',
-                //     data: JSON.stringify(question), 
-                //     contentType: 'application/json'})  
-                // $.get('/api/questions/')
-                // .then(function () {
-                        // loadQuestions()
-                        addMore(10)
-                        // scene.update();
-                        // $("#loader").removeClass("active")
-                }})
+                
+                console.log("loading new items");
+                loadTenQuestions()
+                
+                
+            }
+        });
+
+function loadTenQuestions() {
+    let lastQuestion = document.querySelector('section#question-list').lastElementChild.getAttribute('data-question');
+    lastQuestion = 1
+    for (let i=1; i<11; i++) {
+        let nextQuestion = lastQuestion-i;
+        if (nextQuestion < 0) {
+            $('#loader').remove();
+            
+            
+        }
+        try {
+            requestAQuestion(nextQuestion);
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+    
+}
+
+function requestAQuestion(pk) {
+    $.ajax({
+        url: `/api/questions/${pk}`,
+        method: 'GET',
+        contentType: 'application/json'
+    }).done(function (response) {
+            console.log(response);
+            loadQuestionToDom(response);
+            // loadQuestions()
+            // addMore(10)
+            scene.update();
+            $("#loader").removeClass("active")
+    });
+
+}
 
 
-function addMore(amount) {
-    console.log("in the addMore function")
-    for (let i=1; i<amount; i++) {
-        console.log(i)
-        // loadQuestions()
-        // console.log(loadQuestions())
-        $("<div>How do I get the question content to show up here?!</div>")
-            .addClass("box question")
-            .addClass("new")
-            .appendTo("#all-questions");
-                    }
-    // scene.update();
-    $("#loader").removeClass("active")}
+function loadQuestionToDom(question){
+    document.getElementById('question-list').insertAdjacentHTML('beforeend', questionHTML(question));
+    document.querySelector('.question-controls i').addEventListener('click', starHandler);
+}
+
 
 startQuestions()
