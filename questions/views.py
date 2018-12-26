@@ -48,7 +48,7 @@ class QuestionListView(ListView):
                 'u on a.author_id = u.id', (
                     answer,
                     user_id
-                    )).prefetch_related('answers').prefetch_related('resolved')
+                    ))
         return context
 
 
