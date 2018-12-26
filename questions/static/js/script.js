@@ -169,17 +169,13 @@ function loadAnswers() {
 function loadAnswersInDom(answers) {
     if (answers[0]) {
         console.log(answers[0].question);
-        let answerArea = document.querySelector(`.box.question[data-question='${answers[0].question}'] .answer-box`);
+        let questionBlock = document.querySelector(`.box.question[data-question='${answers[0].question}']`);
+        let answerArea = questionBlock.querySelector(`.answer-box`);
         for (answer of answers) {
             answerArea.insertAdjacentHTML('beforeend', answerHTML(answer));
         }
-        
-        
+        questionBlock.removeEventListener('click', loadAnswers);
     }
-    
-    
-    // let answerArea = document.querySelector(`textarea[data-question='${answer.question}']`);
-    // textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
 
 
