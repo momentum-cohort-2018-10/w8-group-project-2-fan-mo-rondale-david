@@ -200,7 +200,7 @@ function postNewQuestion(){
 
 
 function loadQuestions(){
-    $.get('/api/questions')
+    $.get('/api/questions/')
       .then(function (questions) {
         //   for (let question of questions) {
         //       addQuestionToList(question)
@@ -244,3 +244,68 @@ function csrfSafeMethod(method){
 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
 }
 
+
+
+// Following code is for infinite scrolling feature
+
+// init controller
+var controller = new ScrollMagic.Controller()
+// create scene
+var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
+        .addTo(controller)
+        .addIndicators()
+        .on("enter", function (e) {
+            if (!$("#loader").hasClass("active")) {
+                $("#loader").addClass("active");
+                
+                console.log("loading new items");
+                loadTenQuestions()
+                
+                
+            }
+        });
+
+function loadTenQuestions() {
+    let lastQuestion = document.querySelector('section#question-list').lastElementChild.getAttribute('data-question');
+    lastQuestion = 1
+    for (let i=1; i<11; i++) {
+        let nextQuestion = lastQuestion-i;
+        if (nextQuestion < 0) {
+            $('#loader').remove();
+            
+            
+        }
+        try {
+            requestAQuestion(nextQuestion);
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+    
+}
+
+function requestAQuestion(pk) {
+    $.ajax({
+        url: `/api/questions/${pk}`,
+        method: 'GET',
+        contentType: 'application/json'
+    }).done(function (response) {
+            console.log(response);
+            loadQuestionToDom(response);
+            // loadQuestions()
+            // addMore(10)
+            scene.update();
+            $("#loader").removeClass("active")
+    });
+
+}
+
+
+function loadQuestionToDom(question){
+    document.getElementById('question-list').insertAdjacentHTML('beforeend', questionHTML(question));
+    document.querySelector('.question-controls i').addEventListener('click', starHandler);
+}
+
+
+startQuestions()
