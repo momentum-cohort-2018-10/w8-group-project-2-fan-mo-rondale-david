@@ -89,6 +89,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     """
     author = serializers.StringRelatedField(read_only=True)
     question = serializers.PrimaryKeyRelatedField(read_only=True)
+    starred = serializers.SerializerMethodField()
     answer_detail_link = serializers.HyperlinkedIdentityField(
         view_name='answer-detail')
 
@@ -103,16 +104,26 @@ class AnswerSerializer(serializers.ModelSerializer):
                     "question",
                     "text",
                     "author",
+                    "starred",
                     'star_count',
                     "created_at",
                     'answer_detail_link',
                     'star_list_link'
                 )
+    
+    def get_starred(self, obj):
+        answer = Answer.objects.get(pk=obj.pk)
+        user = self.context.get('request').parser_context['request'].user
+        if answer.stars.filter(user=user):
+            return True
+        else:
+            return False
 
 
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
+    starred = serializers.SerializerMethodField()
     resolved = serializers.PrimaryKeyRelatedField(read_only=True)
     question_resolution_link = serializers.HyperlinkedIdentityField(
         view_name='question-resolution'
@@ -135,6 +146,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'author',
                     'created_at',
                     'text',
+                    'starred',
                     'resolved',
                     'answer_count',
                     'star_count',
@@ -147,3 +159,11 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Question.objects.create(**validated_data)
+
+    def get_starred(self, obj):
+        question = Question.objects.get(pk=obj.pk)
+        user = self.context.get('request').parser_context['request'].user
+        if question.stars.filter(user=user):
+            return True
+        else:
+            return False
