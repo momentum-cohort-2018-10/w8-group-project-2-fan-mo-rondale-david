@@ -32,7 +32,10 @@ urlpatterns = [
          name='account_home'),
     path('userprofile/', questions_views.profile, name='profile'),
     path('userprofile/edit/', questions_views.edit_profile, name='edit_profile'),
-    path('change-password/', questions_views.change_password, name='change_password'),
+    path('userprofile/change-password/', questions_views.change_password, name='change_password'),
+
+    path('starred_question/', questions_views.starred_question, name='starred_question'),
+    path('userprofile/starred/', questions_views.question_starred_list, name='question_starred_list'),
 ]
 
 if settings.DEBUG:

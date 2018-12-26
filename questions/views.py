@@ -13,6 +13,7 @@ class QuestionListView(ListView):
     def get_queryset(self):
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
+            is_starred = False                                                  #Move to question_detail view
             queryset = Question.objects.raw(
                 'SELECT q.*, s.id AS star '
                 'from questions_question q LEFT JOIN '
@@ -24,10 +25,16 @@ class QuestionListView(ListView):
             queryset = Question.objects.all().prefetch_related('answers')
         return queryset
 
+        if question.starred.filter(id=request.user.id).exists():                  #Move to question_detail view
+            is_starred = True
+
+        context = {
+            'is_starred': is_starred,                                           #Move to question_detail view
+        }
 
 @login_required
 def profile(request):
-    return render(request, 'registration/profile.html')
+    return render(request, 'profile/profile.html')
 
 
 def edit_profile(request):
@@ -40,7 +47,7 @@ def edit_profile(request):
     else:
         form = EditProfileForm(instance=request.user)
         args = {'form': form}
-        return render(request, 'registration/edit_profile.html', args)
+        return render(request, 'profile/edit_profile.html', args)
 
 
 def change_password(request):
@@ -58,4 +65,21 @@ def change_password(request):
         form = PasswordChangeForm(user=request.user)
         
         args = {'form': form}
-        return render(request, 'registration/change_password.html', args)
+        return render(request, 'profile/change_password.html', args)
+
+
+def question_starred_list(request):
+    user = request.user
+    starred_questions = user.starred.all()
+    context = {
+        'starred_questions': starred_questions,
+    }
+    return render(request, 'profile/question_starred_list.html', context)
+
+def starred_question(request, id):                                      #Name of the view in the url
+    question = get_object_or_404(Question, id=id)                       #Get the user's starred items by id
+    if question.starred.filter(id=request.user.id).exists():              #If any starred items exists
+        question.starred.remove(request.user)                             #Remove the current user from the db
+    else:        
+        question.starred.add(request.user)                                #Add current user to db
+    return HttpResponseRedirect(question.get_absolute_url())            #Display those starred items from the database

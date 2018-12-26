@@ -1,49 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Homepage - {{ block.super }}
+    Starred Questions - {{ block.super }}
 {% endblock title %}
 
 {% block content %}
-    <h1>Hello & welcome!</h1>
-    <p>Got a question? Let's get you an answer!</p>
-    <button id='ask-question' class='button is-primary'>Ask A ¿Question?</button>
 
-    <div id='modal' class="modal">
-        <div id='modal-background' class="modal-background"></div>
-            <div class="modal-content">
-                <div class="box">
-                    <form id='new-question-form'>
-                    <div class="field">
-                            <label class="label" for="new-question">Question Title</label>
-                                <div class="control">
-                                    <input class="input" type="text" id="new-question-title" name="text">
-                                </div>
-                        </div>
-                        <div class="field">
-                            <label class="label" for="new-question">Question Text</label>
-                                <div class="control">
-                                    <input class="input" type="text" id="new-question-text" name="text">
-                                </div>
-                        </div>
-                    </form>
-                        <div class="field is-grouped">
-                            <div class="control">
-                                <button id="new-question-submit" class="button is-link">Submit</button>
-                            </div>
-                                <div class="control">
-                                    <button id="new-question-cancel" class="button is-text">Cancel</button>
-                                </div>
-                            <div><button id='close-modal' class="modal-close is-large" aria-label="close"></button>
-                            </div>
-                        </div>
-                </div>
-             </div>
-        </div>
-            
-    </div>
-    {% for question in object_list %}
-    
+    {% for question in starred_questions %}
 
     <div class="box question">
         <article class="media">
@@ -89,7 +52,7 @@
                     </div>
                 </nav>
             </div>
-            {% if question.answers.all %}
+            {% comment %} {% if question.answers.all %}
             <div class="answer-box">
                 {% for answer in question.answers.all %}
                     <div class="response">
@@ -103,10 +66,10 @@
 
                 {% endfor %}
             </div>
-            {% endif %}
+            {% endif %} {% endcomment %}
         </article>
     </div>
     {% empty %}
-        <p>No questions yet!</p>
+        <p>No Starred Question found.</p>
     {% endfor %}
 {% endblock content %}
