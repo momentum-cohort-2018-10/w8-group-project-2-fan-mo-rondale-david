@@ -14,32 +14,36 @@ function init() {
         modalBackground.addEventListener('click', toggleModal);
     }
 
-    let questionStars = document.querySelectorAll('.question-controls i');
-    if (questionStars) {
-        questionStars.forEach(function(star){
-            star.addEventListener('click', starHandler);
-        });
-    }
-
     let resolveButtons = document.querySelectorAll('.answer-controls .check');
     if (resolveButtons) {
         resolveButtons.forEach(function(check){
             check.addEventListener('click', resolveQuestion);
         });
     }
-    
-    let answerSubmit = document.querySelectorAll('.submit-answer');
-    if (answerSubmit) {
-        answerSubmit.forEach(function(button){
-            button.addEventListener('click', submitAnswer);
-        });
-    }
-    let questionGetAnswers = document.querySelectorAll('.box.question');
 
-    if (questionGetAnswers) {
-        questionGetAnswers.forEach(function(question) {
-            question.addEventListener('click', loadAnswers);
-        });
+
+    let questionList = document.querySelector('section#question-list');
+    if (questionList) {
+        questionList.addEventListener('click', function(e) {
+            let et = e.target;
+            console.log(et);
+
+            if (et && et.matches('.question-controls i')) {
+                e.stopPropagation();
+                starHandler(et);
+                
+            } else if(et && et.matches('.submit-answer')) {
+                e.stopPropagation();
+                submitAnswer(et);
+                
+            } else if(et && et.matches('.box.question, .box.question *')) {
+                e.stopPropagation();
+                while (!et.matches('.box.question')) {
+                    et = et.parentNode;
+                 }
+                loadAnswers(et);
+            }
+        })
     }
     
 }
@@ -53,15 +57,16 @@ function toggleNavBar(){
 function toggleModal(){
     modal.classList.toggle('is-active');
 }
+let outeret;
 
 //STARRING ITEMS
-function starHandler() {
-    console.log(this);
-    if (this.attributes['data-star']) {
-        let pk = this.attributes['data-star'].value;
+function starHandler(et) {
+
+    if (et['attributes']['data-star']) {
+        let pk = et['attributes']['data-star'].value;
         unstarItem(pk);
     } else {
-        let pk = this.attributes['data-question'].value;
+        let pk = et['attributes']['data-question'].value;
         starItem(pk);
     }
 }
@@ -74,7 +79,6 @@ function starItem(pk){
     }).done(function(response) {
         let star = document.querySelector(`i[data-question='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
-        star.addEventListener('click', unstarItem);
         toggleStar(star);
         console.log(response);
     }).fail(function(response) {
@@ -158,13 +162,14 @@ function answerHTML(answer) {
 `
 }
 
-function submitAnswer() {
-    let pk = this.attributes['data-question'].value;
+function submitAnswer(et) {
+    
+    let pk = et.attributes['data-question'].value;
     let textarea = document.querySelector(`textarea[data-question='${pk}']`);
 
     let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
-    questionBlock.removeEventListener('click', loadAnswers);
-
+    
+    
     $.ajax({
         method: 'POST',
         url: `/api/questions/${pk}/answers/`,
@@ -172,7 +177,6 @@ function submitAnswer() {
             text: textarea.value
         }
     }).done(function(response){
-        console.log(response);
         textarea.value = "";
         addAnswer(response);
     }).fail(function(response){
@@ -188,8 +192,9 @@ function addAnswer(answer) {
     textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
 
-function loadAnswers() {
-    let pk = this.getAttribute('data-question');
+function loadAnswers(e) {
+    console.log(e)
+    let pk = e.getAttribute('data-question');
     $.ajax({
         method: 'GET',
         url: `/api/questions/${pk}/answers/`,
@@ -229,14 +234,42 @@ function questionHTML(question){
                     <div class="level-left question-controls">
                         <a class="level-item" aria-label="like">
                             <span class="icon is-medium">
-                                    <i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>
+                                ${question.starred 
+                                    ? `<i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="${question.id}" data-star="${question.starred}"></i>`
+                                    : `<i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>`
+                                }
+                                
                             </span>
                         </a>
                         <div>
-                            <p><strong>0 Answers</strong></p>
+                            <p><strong>${question.answer_count} Answers</strong></p>
                         </div>
                     </div>
                 </nav>
+            </div>
+            <div class="answer-box">
+                    
+            ${question.resolved
+                ? `<div class="response resolution">
+                        <p>
+                            <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ question.resolved.resolving_answer.created_at }}</small>
+                            <br>
+                            <p>{{ question.resolved.resolving_answer.text }}</p>
+                        </p>
+                    </div>`
+                : `<div class="response">
+                        <div class="field">
+                            <form action="">
+                                <label class="label" for="text">Respond to Question</label>
+                                <textarea name="text" cols="30" rows="10" data-question="${question.id}" class="textarea"></textarea>
+                            </form>
+                        </div>
+                        <div class="control">
+                            <button class="button is-link submit-answer" data-question="${question.id}">Submit</button>
+                        </div>
+                    </div>`
+                }
+
             </div>
         </article>
     </div>
@@ -262,6 +295,7 @@ function postNewQuestion(){
 
 
 function addQuestionToList(question){
+    
     document.getElementById('question-list').insertAdjacentHTML('afterbegin', questionHTML(question));
     document.querySelector('.question-controls i').addEventListener('click', starHandler);
 }

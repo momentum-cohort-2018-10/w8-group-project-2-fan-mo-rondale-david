@@ -110,14 +110,16 @@ class AnswerSerializer(serializers.ModelSerializer):
                     'answer_detail_link',
                     'star_list_link'
                 )
-    
+
     def get_starred(self, obj):
         answer = Answer.objects.get(pk=obj.pk)
         user = self.context.get('request').parser_context['request'].user
-        if answer.stars.filter(user=user):
-            return True
+        user_star = answer.stars.filter(user=user)
+
+        if user_star:
+            return user_star[0].pk
         else:
-            return False
+            return 0
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -163,7 +165,8 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_starred(self, obj):
         question = Question.objects.get(pk=obj.pk)
         user = self.context.get('request').parser_context['request'].user
-        if question.stars.filter(user=user):
-            return True
+        user_star = question.stars.filter(user=user)
+        if user_star:
+            return user_star[0].pk
         else:
-            return False
+            return 0
