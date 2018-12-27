@@ -50,7 +50,11 @@ function toggleNavBar(){
     document.querySelector('.navbar-menu').classList.toggle('is-active');
 }
 
+function toggleModal(){
+    modal.classList.toggle('is-active');
+}
 
+//STARRING ITEMS
 function starHandler() {
     console.log(this);
     if (this.attributes['data-star']) {
@@ -99,7 +103,7 @@ function toggleStar(icon){
 
 }
 
-
+//RESOLVING QUESTIONS
 function resolveQuestion(){
     let pk = this.attributes['data-question'].value;
     let answer = this.attributes['data-answer'].value;
@@ -134,7 +138,7 @@ function addResolutionBlock(answer){
     response.parentNode.parentNode.classList.add('resolution')
 }
 
-
+//ADDING ANSWERS
 function answerHTML(answer) {
     let questionAuthor = document.querySelector(
         `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
@@ -158,6 +162,9 @@ function submitAnswer() {
     let pk = this.attributes['data-question'].value;
     let textarea = document.querySelector(`textarea[data-question='${pk}']`);
 
+    let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
+    questionBlock.removeEventListener('click', loadAnswers);
+
     $.ajax({
         method: 'POST',
         url: `/api/questions/${pk}/answers/`,
@@ -176,6 +183,7 @@ function submitAnswer() {
 }
 
 function addAnswer(answer) {
+    
     let textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
     textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
@@ -195,7 +203,6 @@ function loadAnswers() {
 
 function loadAnswersInDom(answers) {
     if (answers[0]) {
-        console.log(answers[0].question);
         let questionBlock = document.querySelector(`.box.question[data-question='${answers[0].question}']`);
         let answerArea = questionBlock.querySelector(`.answer-box`);
         for (answer of answers) {
@@ -205,7 +212,7 @@ function loadAnswersInDom(answers) {
     }
 }
 
-
+//ADDING QUESTIONS
 function questionHTML(question){
     return `
     <div class="box question" data-question="${question.id}">
@@ -254,15 +261,6 @@ function postNewQuestion(){
 }
 
 
-function loadQuestions(){
-    $.get('/api/questions/')
-      .then(function (questions) {
-        //   for (let question of questions) {
-        //       addQuestionToList(question)
-        //   }
-      })
-}
-
 function addQuestionToList(question){
     document.getElementById('question-list').insertAdjacentHTML('afterbegin', questionHTML(question));
     document.querySelector('.question-controls i').addEventListener('click', starHandler);
@@ -273,14 +271,11 @@ function startQuestions() {
     document.getElementById('ask-question').addEventListener('click', toggleModal);
     document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
     document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
-    loadQuestions()
     setupCSRFAjax()
 }
 startQuestions()
 
-function toggleModal(){
-    modal.classList.toggle('is-active');
-}
+
 
 
 
@@ -305,9 +300,8 @@ var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEn
 
 function loadTenQuestions() {
     let lastQuestion = document.querySelector('section#question-list').lastElementChild.getAttribute('data-question');
-    lastQuestion = 1
     for (let i=1; i<11; i++) {
-        let nextQuestion = lastQuestion-i;
+        let nextQuestion = lastQuestion - i;
         if (nextQuestion < 0) {
             $('#loader').remove();
             
@@ -331,8 +325,8 @@ function requestAQuestion(pk) {
     }).done(function (response) {
             console.log(response);
             loadQuestionToDom(response);
-            // loadQuestions()
-            // addMore(10)
+            
+            
             scene.update();
             $("#loader").removeClass("active")
     });
@@ -342,7 +336,7 @@ function requestAQuestion(pk) {
 
 function loadQuestionToDom(question){
     document.getElementById('question-list').insertAdjacentHTML('beforeend', questionHTML(question));
-    document.querySelector('.question-controls i').addEventListener('click', starHandler);
+    document.querySelector(`.question-controls i[data-question='${question.id}']`).addEventListener('click', starHandler);
 }
 
 startQuestions()

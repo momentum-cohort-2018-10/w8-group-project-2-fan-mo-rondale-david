@@ -87,23 +87,16 @@
                         
                 
                 {% if question.resolved %}
-                    {% for answer in question.answers.all %}
-                        <div class="response {% if answer.id == question.resolved.resolving_answer.id %}resolution{% endif %}">
-                            <p>
-                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
-                                <br>
-                                <p>{{ answer.text }}</p>
-                                <div class="answer-controls">
-                                    {% if answer.star %}
-                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
-                                    {% else %}
-                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
-                                    {% endif %}
-                                </div>
-                            </p>
-                        </div>
+                    
+                    <div class="response resolution">
+                        <p>
+                            <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ uestion.resolved.resolving_answer.created_at }}</small>
+                            <br>
+                            <p>{{ answer.text }}</p>
+                        </p>
+                    </div>
 
-                    {% endfor %}
+                    
                 {% else %}
                         <div class="response">
                             <div class="field">
@@ -118,9 +111,8 @@
                             </div>
                         </div>
                         
-                    {% for answer in question.answers.all %}
-
-                        <div class="response">
+                    
+                        {% comment %} <div class="response">
                             <p>
                                 <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
                                 <br>
@@ -143,9 +135,7 @@
                                 
 
                             </p>
-                        </div>
-
-                    {% endfor %}
+                        </div> {% endcomment %}
 
                 {% endif %}
 
