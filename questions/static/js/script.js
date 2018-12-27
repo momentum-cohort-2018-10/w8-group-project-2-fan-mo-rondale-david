@@ -1,20 +1,47 @@
 function init() {
-    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
-    document.getElementById('close-modal').addEventListener('click', toggleModal);
-    document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls i').forEach(function(star){
-        star.addEventListener('click', starHandler);
-    });
-    document.querySelectorAll('.answer-controls .check').forEach(function(check){
-        check.addEventListener('click', resolveQuestion);
-    });
+    let navBar = document.querySelector('.navbar-burger');
+    if (navBar) {
+        navBar.addEventListener('click', toggleNavBar);
+    }
 
-    document.querySelectorAll('.submit-answer').forEach(function(button){
-        button.addEventListener('click', submitAnswer);
-    });
-    document.querySelectorAll('.box.question').forEach(function(question) {
-        question.addEventListener('click', loadAnswers);
-    })
+    let modalCloser = document.getElementById('close-modal');
+    if (modalCloser) {
+        modalCloser.addEventListener('click', toggleModal);
+    }
+
+    let modalBackground = document.getElementById('modal-background');
+    if (modalBackground) {
+        modalBackground.addEventListener('click', toggleModal);
+    }
+
+    let questionStars = document.querySelectorAll('.question-controls i');
+    if (questionStars) {
+        questionStars.forEach(function(star){
+            star.addEventListener('click', starHandler);
+        });
+    }
+
+    let resolveButtons = document.querySelectorAll('.answer-controls .check');
+    if (resolveButtons) {
+        resolveButtons.forEach(function(check){
+            check.addEventListener('click', resolveQuestion);
+        });
+    }
+    
+    let answerSubmit = document.querySelectorAll('.submit-answer');
+    if (answerSubmit) {
+        answerSubmit.forEach(function(button){
+            button.addEventListener('click', submitAnswer);
+        });
+    }
+    let questionGetAnswers = document.querySelectorAll('.box.question');
+
+    if (questionGetAnswers) {
+        questionGetAnswers.forEach(function(question) {
+            question.addEventListener('click', loadAnswers);
+        });
+    }
+    
 }
 init()
 
@@ -255,23 +282,6 @@ function toggleModal(){
     modal.classList.toggle('is-active');
 }
 
-function setupCSRFAjax () {
-    var csrftoken = Cookies.get('csrftoken')
-  
-    $.ajaxSetup({
-      beforeSend: function (xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-          xhr.setRequestHeader('X-CSRFToken', csrftoken)
-        }
-      }
-    })
-}
-
-function csrfSafeMethod(method){
-// these HTTP methods do not require CSRF protection
-return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
-}
-
 
 
 // Following code is for infinite scrolling feature
@@ -335,5 +345,22 @@ function loadQuestionToDom(question){
     document.querySelector('.question-controls i').addEventListener('click', starHandler);
 }
 
-
 startQuestions()
+
+
+function setupCSRFAjax () {
+    var csrftoken = Cookies.get('csrftoken')
+  
+    $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+          xhr.setRequestHeader('X-CSRFToken', csrftoken)
+        }
+      }
+    })
+}
+
+function csrfSafeMethod(method){
+// these HTTP methods do not require CSRF protection
+return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method))
+}
