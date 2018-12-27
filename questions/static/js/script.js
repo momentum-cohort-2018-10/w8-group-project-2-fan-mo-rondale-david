@@ -19,7 +19,7 @@ function init() {
     if (questionList) {
         questionList.addEventListener('click', function(e) {
             let et = e.target;
-            console.log(et);
+            
 
             if (et && et.matches('.question-controls i')) {
                 e.stopPropagation();
@@ -147,7 +147,7 @@ function addResolutionBlock(answer){
 }
 
 //ADDING ANSWERS
-function answerHTML(answer) {
+function answerHTML(answer, resolved) {
     let questionAuthor = document.querySelector(
         `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
 
@@ -166,7 +166,7 @@ function answerHTML(answer) {
                         : `<i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="${answer.question}"></i>`
                     }
 
-                    ${answer.author === questionAuthor && !answer.resolved_answer
+                    ${answer.author === questionAuthor && !resolved
                         ? `<div class="answer-controls">
                                 <a class="button is-outlined is-small check" data-question="${answer.question}" data-answer="${answer.id}">
                                     <i class="fas fa-check"></i> &nbsp; Mark as Resolved
@@ -205,13 +205,13 @@ function submitAnswer(et) {
 }
 
 function addAnswer(answer) {
-    
     let textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
-    textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
+
+    textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer, false));
 }
 
 function loadAnswers(e) {
-    console.log(e)
+
     let pk = e.getAttribute('data-question');
     $.ajax({
         method: 'GET',
@@ -230,14 +230,16 @@ function loadAnswersInDom(answers) {
         let questionBlock = document.querySelector(`.box.question[data-question='${answers[0].question}']`);
         //clear resolve display
         let resolve = questionBlock.querySelector('.resolution');
-        
+        let resolved = false;
         if (resolve) {
             resolve.remove();
+            resolved = true;
         }
 
         let answerArea = questionBlock.querySelector(`.answer-box`);
         for (answer of answers) {
-            answerArea.insertAdjacentHTML('beforeend', answerHTML(answer));
+            
+            answerArea.insertAdjacentHTML('beforeend', answerHTML(answer, resolved));
         }
         openQuestion = answers[0].question
     }
@@ -266,7 +268,7 @@ function putResolveBack(pk) {
     }).done(function(response) {
         if (response[0] && (response[0].resolving_answer.question != openQuestion)) {
             let answerArea = questionBlock.querySelector('.answer-box');
-            console.log(response[0].resolving_answer);
+            
             answerArea.insertAdjacentHTML('afterbegin', answerHTML(response[0].resolving_answer));
             
         }
@@ -346,7 +348,7 @@ function postNewQuestion(){
         data: JSON.stringify(question), 
         contentType: 'application/json'
     }).then(function (question) {
-        console.log(question);
+
         addQuestionToList(question)
         toggleModal();
     });

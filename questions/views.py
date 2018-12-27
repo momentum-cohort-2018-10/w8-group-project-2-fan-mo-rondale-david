@@ -17,13 +17,18 @@ class QuestionListView(ListView):
             question = ContentType.objects.get(model='question').id
 
             queryset = Question.objects.raw(
-                'SELECT q.*, s.id AS star, u.username AS author_name '
+                'SELECT q.*, s.id AS star, u.username AS author_name, '
+                'Count(ans.question_id) as answer_count '
                 'from questions_question q '
                 'LEFT JOIN (SELECT * FROM questions_starreditem '
                 'WHERE content_type_id = %s and user_id = %s) '
                 's ON q.id = s.object_id '
                 'LEFT JOIN (SELECT u.id, u.username from questions_user u) '
                 'u on q.author_id = u.id '
+                'INNER JOIN (SELECT ans.question_id '
+                'from questions_answer ans) '
+                'ans on q.id = ans.question_id '
+                'GROUP BY q.id, s.id, u.username '
                 'ORDER BY q.created_at DESC', (
                     question,
                     user_id
