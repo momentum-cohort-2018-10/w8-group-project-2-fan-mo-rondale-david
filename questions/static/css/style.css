@@ -62,3 +62,13 @@ p.box-information {
 i.starred {
     color: #fff000;
 }
+
+.load-image {
+    text-align: center;
+}
+
+.blob {
+    height: auto;
+    max-width: 20%;
+
+}
