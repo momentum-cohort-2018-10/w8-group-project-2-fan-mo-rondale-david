@@ -122,11 +122,27 @@ class AnswerSerializer(serializers.ModelSerializer):
             return 0
 
 
+class DetailedAnswerResolveSerializer(serializers.ModelSerializer):
+    resolved_question = serializers.PrimaryKeyRelatedField(read_only=True)
+    resolving_answer = AnswerSerializer()
+
+    class Meta:
+        model = Resolve
+        fields = (
+            'resolved_question',
+            'resolving_answer'
+        )
+
+    def create(self, validated_data):
+        return Resolve.objects.create(**validated_data)
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
     starred = serializers.SerializerMethodField()
-    resolved = serializers.PrimaryKeyRelatedField(read_only=True)
+    resolved = DetailedAnswerResolveSerializer(read_only=True)
+
     question_resolution_link = serializers.HyperlinkedIdentityField(
         view_name='question-resolution'
     )
