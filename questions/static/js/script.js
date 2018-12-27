@@ -150,7 +150,6 @@ function addAnswer(answer) {
     textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
 
-
 function questionHTML(question){
     return `
     <div class="box question" data-question="${question.id}">
@@ -159,7 +158,7 @@ function questionHTML(question){
                 <div class="content">
                     <h2>${question.title}</h2>
                         <p class="box-information">
-                        <small>${question.author}</small> - <small>${question.created_at}</small>
+                        <small>${question.author}</small> - <small>${moment(question.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                         </p>
                         ${question.text}
                 </div>
@@ -270,9 +269,6 @@ function loadTenQuestions() {
     // lastQuestion = 1
     for (let i=1; i<11; i++) {
         let nextQuestion = lastQuestion-i;
-        console.log(lastQuestion)
-        console.log(i)
-        console.log(nextQuestion)
         if (nextQuestion < 51) {
             $('#loader').remove();
             
