@@ -106,10 +106,10 @@ function toggleStar(icon){
 
 //RESOLVING QUESTIONS
 function resolveQuestion(et){
-    console.log(et);
+
     let pk = et.attributes['data-question'].value;
     let answer = et.attributes['data-answer'].value;
-    console.log(pk, answer);
+    
     $.ajax({
         method: 'POST',
         url: `/api/questions/${pk}/resolve/`,
@@ -117,6 +117,7 @@ function resolveQuestion(et){
             resolving_answer: answer
         }
     }).done(function(response){
+        console.log(response);
         addResolutionBlock(response.resolving_answer);
         removeResolveButtons(response.resolved_question);
         
@@ -137,7 +138,12 @@ function removeResolveButtons(question){
 
 function addResolutionBlock(answer){
     let response = document.querySelector(`a[data-answer="${answer}"]`);
-    response.parentNode.parentNode.classList.add('resolution')
+
+    while (!response.matches('.response')) {
+        response = response.parentNode;
+
+     }
+    response.classList.add('resolution');
 }
 
 //ADDING ANSWERS
@@ -160,7 +166,7 @@ function answerHTML(answer) {
                         : `<i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="${answer.question}"></i>`
                     }
 
-                    ${answer.author === questionAuthor 
+                    ${answer.author === questionAuthor && !answer.resolved_answer
                         ? `<div class="answer-controls">
                                 <a class="button is-outlined is-small check" data-question="${answer.question}" data-answer="${answer.id}">
                                     <i class="fas fa-check"></i> &nbsp; Mark as Resolved
