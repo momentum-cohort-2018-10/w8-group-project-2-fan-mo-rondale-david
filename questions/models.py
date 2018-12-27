@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import (
 )
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.core.mail import send_mail, EmailMultiAlternatives
 
 
 class User(AbstractUser):
@@ -59,6 +60,20 @@ class Answer(Timestamp):
 
     def __str__(self):
         return f'{self.text[:20]}...'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        email = EmailMultiAlternatives(
+            from_email='questionbox18@gmail.com',
+            to=self.question.author.email,
+            subject='You have a new answer',
+            body=f"""
+You have a new answer! {{ question.author.username }} just provided an 
+answer on your QuestionBox.
+            """
+        )
+        email.send()
 
 
 class Resolve(Timestamp):

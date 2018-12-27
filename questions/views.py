@@ -54,20 +54,20 @@ class QuestionListView(ListView):
                     ))
         return context
 
-def email_one(request):
-    subject = "You've got Answers"
-    to = ['david@davidlndean.com']
-    from_email = 'questionbox18@gmail.com'
+# def email_one(request):
+#     subject = "You've got Answers"
+#     to = ['david@davidlndean.com']
+#     from_email = 'questionbox18@gmail.com'
 
-    ctx = {
-        'question.author_name': 'John',
-    }
+#     ctx = {
+#         'question.author_name': 'John',
+#     }
 
-    message = render_to_string('question/email/email.txt', ctx)
+#     message = render_to_string('question/email/email.txt', ctx)
 
-    EmailMessage(subject, message, to=to, from_email+from_email).send()
+#     EmailMessage(subject, message, from_email+from_email).send()
 
-    return HttpResponse['email_one']
+#     return HttpResponse['email_one']
 
 @login_required
 def profile(request):
