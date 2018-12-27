@@ -8,26 +8,20 @@
 {% block content %}
 <div class="tabs is-boxed is-centered main-menu" id="nav">
   <ul>
-      <li data-target="pane-1" id="1" class="is-active">
-          <a>
-              <span class="icon is-small"><i class="fa fa-user"></i></span>
-              <span>My Profile</span>
-          </a>
-      </li>
-      <li data-target="pane-2" id="2">
+      <li data-target="pane-1" id="1">
           <a>
               <span class="icon is-small"><i class="fas fa-question"></i></span>
               <span>My Questions</span>
           </a>
       </li>
-      <li data-target="pane-3" id="3">
+      <li data-target="pane-2" id="2">
           <a>
               <span class="icon is-small"><i class="fas fa-comment"></i></span>
               <span>My Answers</span>
           </a>
       </li>
-      <li data-target="pane-4" id="4">
-          <a href="{% url 'question_starred_list' %}">
+      <li data-target="pane-3" id="3">
+          <a>
               <span class="icon is-small"><i class="fas fa-star"></i></span>
               <span>My Starred</span>
           </a>

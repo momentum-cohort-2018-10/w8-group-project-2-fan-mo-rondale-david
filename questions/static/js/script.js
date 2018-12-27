@@ -1,17 +1,19 @@
 function init() {
-    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
-    document.getElementById('close-modal').addEventListener('click', toggleModal);
-    document.getElementById('modal-background').addEventListener('click', toggleModal);
-    document.querySelectorAll('.question-controls i').forEach(function(star){
-        star.addEventListener('click', starHandler);
-    });
-    document.querySelectorAll('.answer-controls .check').forEach(function(check){
-        check.addEventListener('click', resolveQuestion);
-    });
+    // document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
+    // document.getElementById('close-modal').addEventListener('click', toggleModal);
+    // document.getElementById('modal-background').addEventListener('click', toggleModal);
+    // document.querySelectorAll('.question-controls i').forEach(function(star){
+    //     star.addEventListener('click', starHandler);
+    // });
+    // document.querySelectorAll('.answer-controls .check').forEach(function(check){
+    //     check.addEventListener('click', resolveQuestion);
+    // });
 
-    document.querySelectorAll('.submit-answer').forEach(function(button){
-        button.addEventListener('click', submitAnswer);
-    });
+    // document.querySelectorAll('.submit-answer').forEach(function(button){
+    //     button.addEventListener('click', submitAnswer);
+    // });
+    document.querySelector("li[data-target='pane-1']").addEventListener('click', getUserQuestions);
+    document.querySelector("li[data-target='pane-2']").addEventListener('click', getUserAnswers);
 }
 init()
 
@@ -32,19 +34,7 @@ function starHandler() {
     }
 }
 
-function init() {
-    document.querySelector('.navbar-burger').addEventListener('click', toggleNavBar);
-    // click button to ask a question, opens modal with form
-    // document.getElementById('ask-question').addEventListener('click', toggleModal);
-    // document.getElementById('close-modal').addEventListener('click', toggleModal);
-    // document.getElementById('modal-background').addEventListener('click', toggleModal);
-    // document.querySelectorAll('.question-controls .unstarred').forEach(function(star){
-    //     star.addEventListener('click', starItem);
-    // });
-    // document.getElementById('new-question-cancel').addEventListener('click', toggleModal)
-    // document.getElementById('new-question-submit').addEventListener('click', postNewQuestion)
-    document.querySelector("li[data-target='pane-2']").addEventListener('click', getUserQuestions);
-}
+
 function starItem(pk){
     
     $.ajax({
@@ -227,6 +217,8 @@ function addQuestionToList(question){
     document.querySelector('.question-controls i').addEventListener('click', starHandler);
 }
 
+
+
 function startQuestions() {
     // click button to ask a question, opens modal with form
     document.getElementById('ask-question').addEventListener('click', toggleModal);
@@ -261,12 +253,59 @@ function getUserQuestions() {
     }).done(function(response){
         console.log(response);
         document.querySelector('.tile.is-child.box').innerHTML = "";
-        
+        addQuestionsToProfile(response)
     }).fail(function(response){
         console.log("There was an issue gettting the user's questions.");
         console.log(response);
     })
 }
+
+function addQuestionsToProfile(questions){
+    for (question of questions) {
+        document.querySelector('.tile.is-child.box').insertAdjacentHTML('afterbegin', questionHTML(question));
+    }
+}
+
+
+function getUserAnswers(){
+    $.ajax({
+        method: 'GET',
+        url: "/api/my-answers/"
+    }).done(function(response){
+        console.log(response);
+        document.querySelector('.tile.is-child.box').innerHTML = "";
+        addAnswersToProfile(response)
+    }).fail(function(response){
+        console.log("There was an issue gettting the user's answers.");
+        console.log(response);
+    })
+}
+
+
+function userAnswerHTML(answer) {
+    return`
+    <div class="box question">
+        <article class="media">
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <small>${answer.author}</small> - <small>${answer.created_at}</small>
+                        <br>
+                        ${answer.text}
+                    </p>
+                </div>
+            </div>
+        </article>
+    </div>
+    `
+}
+
+function addAnswersToProfile(answers){
+    for (answer of answers) {
+        document.querySelector('.tile.is-child.box').insertAdjacentHTML('afterbegin', userAnswerHTML(answer));
+    }
+}
+
 
 function csrfSafeMethod(method){
 // these HTTP methods do not require CSRF protection

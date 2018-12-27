@@ -86,21 +86,4 @@ def change_password(request):
         form = PasswordChangeForm(user=request.user)
 
         args = {'form': form}
-        return render(request, 'profile/change_password.html', args)
-
-
-def question_starred_list(request):
-    user = request.user
-    starred_questions = user.starred.all()
-    context = {
-        'starred_questions': starred_questions,
-    }
-    return render(request, 'profile/question_starred_list.html', context)
-
-def starred_question(request, id):                                      
-    question = get_object_or_404(Question, id=id)                       
-    if question.starred.filter(id=request.user.id).exists():              
-        question.starred.remove(request.user)                             
-    else:        
-        question.starred.add(request.user)                                
-    return HttpResponseRedirect(question.get_absolute_url())            
+        return render(request, 'profile/change_password.html', args)  
