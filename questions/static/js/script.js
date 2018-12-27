@@ -150,7 +150,6 @@ function addAnswer(answer) {
     textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer));
 }
 
-
 function questionHTML(question){
     return `
     <div class="box question" data-question="${question.id}">
@@ -159,7 +158,7 @@ function questionHTML(question){
                 <div class="content">
                     <h2>${question.title}</h2>
                         <p class="box-information">
-                        <small>${question.author}</small> - <small>${question.created_at}</small>
+                        <small>${question.author}</small> - <small>${moment(question.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                         </p>
                         ${question.text}
                 </div>
@@ -267,10 +266,10 @@ var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEn
 
 function loadTenQuestions() {
     let lastQuestion = document.querySelector('section#question-list').lastElementChild.getAttribute('data-question');
-    lastQuestion = 1
+    // lastQuestion = 1
     for (let i=1; i<11; i++) {
         let nextQuestion = lastQuestion-i;
-        if (nextQuestion < 0) {
+        if (nextQuestion < 51) {
             $('#loader').remove();
             
             
@@ -280,6 +279,7 @@ function loadTenQuestions() {
         }
         catch(error) {
             console.log(error);
+            
         }
     }
     
