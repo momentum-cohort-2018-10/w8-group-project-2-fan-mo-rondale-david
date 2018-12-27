@@ -146,7 +146,9 @@ function answerHTML(answer) {
         `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
 
     return `
-        <div class="response">
+        <div class="response ${answer.resolved_answer
+                                ? 'resolution'
+                                : ''}">
             <p>
                 <small>${answer.author}</small> - <small>${answer.created_at}</small>
                 <br>
@@ -222,6 +224,7 @@ function loadAnswersInDom(answers) {
         let questionBlock = document.querySelector(`.box.question[data-question='${answers[0].question}']`);
         //clear resolve display
         let resolve = questionBlock.querySelector('.resolution');
+        
         if (resolve) {
             resolve.remove();
         }
@@ -238,29 +241,34 @@ function removeAnswersFromPrevious(pk) {
     let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
     if (questionBlock) {
         let responses = questionBlock.querySelectorAll('.response');
+        
         for (response of responses) {
             response.remove();
         }
+        putResolveBack(pk);
+        
     }
     
 }
 
-function putResolveBack() {
-    
+function putResolveBack(pk) {
+    let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
+
+    $.ajax({
+        method: 'GET',
+        url: `/api/questions/${pk}/resolve/`
+    }).done(function(response) {
+        if (response[0] && (response[0].resolving_answer.question != openQuestion)) {
+            let answerArea = questionBlock.querySelector('.answer-box');
+            console.log(response[0].resolving_answer);
+            answerArea.insertAdjacentHTML('afterbegin', answerHTML(response[0].resolving_answer));
+            
+        }
+    }).fail(function(response) {
+        console.log("There was an issue getting the resolution");
+    });
 }
 
-function resolveHTML(resolve) {
-    return `
-        <div class="response resolution">
-            <p>
-                <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ question.resolved.resolving_answer.created_at }}</small>
-                <br>
-                <p>{{ question.resolved.resolving_answer.text }}</p>
-            </p>
-        </div>
-    
-    `
-}
 
 //ADDING QUESTIONS
 function questionHTML(question){
