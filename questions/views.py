@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from questions.forms import EditProfileForm
 from django.views.generic.list import ListView
-from questions.models import Question, Answer
+from questions.models import Question
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -20,54 +20,26 @@ class QuestionListView(ListView):
             question = ContentType.objects.get(model='question').id
 
             queryset = Question.objects.raw(
-                'SELECT q.*, s.id AS star, u.username AS author_name '
+                'SELECT q.*, s.id AS star, u.username AS author_name, '
+                'Count(ans.question_id) as answer_count '
                 'from questions_question q '
                 'LEFT JOIN (SELECT * FROM questions_starreditem '
                 'WHERE content_type_id = %s and user_id = %s) '
                 's ON q.id = s.object_id '
                 'LEFT JOIN (SELECT u.id, u.username from questions_user u) '
                 'u on q.author_id = u.id '
-                'ORDER BY q.created_at DESC', (
-                    question,
-                    user_id
-                    )).prefetch_related('answers').prefetch_related('resolved')
+                'INNER JOIN (SELECT ans.question_id '
+                'from questions_answer ans) '
+                'ans on q.id = ans.question_id '
+                'GROUP BY q.id, s.id, u.username '
+                'ORDER BY q.created_at DESC',
+                (question, user_id
+                 )).prefetch_related('answers').prefetch_related('resolved')
 
         else:
             queryset = Question.objects.all().prefetch_related('answers')
         return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_id = self.request.user.id
-        answer = ContentType.objects.get(model='answer').id
-
-        context['answers'] = Answer.objects.raw(
-                'SELECT a.*, s.id AS star, u.username AS author_name '
-                'from questions_answer a '
-                'LEFT JOIN (SELECT * FROM questions_starreditem '
-                'WHERE content_type_id = %s and user_id = %s) '
-                's ON a.id = s.object_id '
-                'LEFT JOIN (SELECT u.id, u.username from questions_user u) '
-                'u on a.author_id = u.id', (
-                    answer,
-                    user_id
-                    ))
-        return context
-
-# def email_one(request):
-#     subject = "You've got Answers"
-#     to = ['david@davidlndean.com']
-#     from_email = 'questionbox18@gmail.com'
-
-#     ctx = {
-#         'question.author_name': 'John',
-#     }
-
-#     message = render_to_string('question/email/email.txt', ctx)
-
-#     EmailMessage(subject, message, from_email+from_email).send()
-
-#     return HttpResponse['email_one']
 
 @login_required
 def profile(request):
