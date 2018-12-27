@@ -287,7 +287,7 @@ function questionHTML(question){
                 <div class="content">
                     <h2>${question.title}</h2>
                         <p class="box-information">
-                        <small>${question.author}</small> - <small>${question.created_at}</small>
+                        <small>${question.author}</small> - <small>${moment(question.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                         </p>
                         ${question.text}
                 </div>
@@ -407,6 +407,7 @@ function loadTenQuestions() {
         }
         catch(error) {
             console.log(error);
+            
         }
     }
     
