@@ -269,7 +269,7 @@ function putResolveBack(pk) {
         if (response[0] && (response[0].resolving_answer.question != openQuestion)) {
             let answerArea = questionBlock.querySelector('.answer-box');
             
-            answerArea.insertAdjacentHTML('afterbegin', answerHTML(response[0].resolving_answer));
+            answerArea.insertAdjacentHTML('afterbegin', answerHTML(response[0].resolving_answer, true));
             
         }
     }).fail(function(response) {
