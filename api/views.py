@@ -3,7 +3,8 @@ from api.serializers import (
     StarredItemSerializer,
     QuestionSerializer,
     AnswerSerializer,
-    ResolveSerializer
+    ResolveSerializer,
+    DetailedAnswerResolveSerializer
 )
 from questions.models import User, StarredItem, Question, Answer, Resolve
 from rest_framework import generics
@@ -185,7 +186,6 @@ class QuestionResolve(generics.ListCreateAPIView):
     Displays resolution for a question
     Allows question owner to choose a correct answer
     """
-    serializer_class = ResolveSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, OnlyAuthorCanMarkResolved)
 
     def get_queryset(self):
@@ -195,6 +195,13 @@ class QuestionResolve(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
         serializer.save(resolved_question=question)
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return DetailedAnswerResolveSerializer
+        if self.request.method == 'POST':
+            return ResolveSerializer
+        return ResolveSerializer
 
 
 class AnswerStarList(generics.ListCreateAPIView):

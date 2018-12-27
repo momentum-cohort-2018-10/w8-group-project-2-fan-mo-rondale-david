@@ -89,6 +89,8 @@ class AnswerSerializer(serializers.ModelSerializer):
     """
     author = serializers.StringRelatedField(read_only=True)
     question = serializers.PrimaryKeyRelatedField(read_only=True)
+    resolved_answer = serializers.BooleanField(read_only=True)
+    starred = serializers.SerializerMethodField()
     answer_detail_link = serializers.HyperlinkedIdentityField(
         view_name='answer-detail')
 
@@ -103,17 +105,46 @@ class AnswerSerializer(serializers.ModelSerializer):
                     "question",
                     "text",
                     "author",
+                    "starred",
+                    "resolved_answer",
                     'star_count',
                     "created_at",
                     'answer_detail_link',
                     'star_list_link'
                 )
 
+    def get_starred(self, obj):
+        answer = Answer.objects.get(pk=obj.pk)
+        user = self.context.get('request').parser_context['request'].user
+        user_star = answer.stars.filter(user=user)
+
+        if user_star:
+            return user_star[0].pk
+        else:
+            return 0
+
+
+class DetailedAnswerResolveSerializer(serializers.ModelSerializer):
+    resolved_question = serializers.PrimaryKeyRelatedField(read_only=True)
+    resolving_answer = AnswerSerializer()
+
+    class Meta:
+        model = Resolve
+        fields = (
+            'resolved_question',
+            'resolving_answer'
+        )
+
+    def create(self, validated_data):
+        return Resolve.objects.create(**validated_data)
+
 
 class QuestionSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
-    resolved = serializers.PrimaryKeyRelatedField(read_only=True)
+    starred = serializers.SerializerMethodField()
+    resolved = DetailedAnswerResolveSerializer(read_only=True)
+
     question_resolution_link = serializers.HyperlinkedIdentityField(
         view_name='question-resolution'
     )
@@ -135,6 +166,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'author',
                     'created_at',
                     'text',
+                    'starred',
                     'resolved',
                     'answer_count',
                     'star_count',
@@ -147,3 +179,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Question.objects.create(**validated_data)
+
+    def get_starred(self, obj):
+        question = Question.objects.get(pk=obj.pk)
+        user = self.context.get('request').parser_context['request'].user
+        user_star = question.stars.filter(user=user)
+        if user_star:
+            return user_star[0].pk
+        else:
+            return 0

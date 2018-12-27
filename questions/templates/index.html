@@ -78,7 +78,7 @@
                                 </span>
                             </a>
                             <div>
-                                <p><strong>{{ question.answers.count }} Answer{{ question.answers.count|pluralize }}</strong></p>
+                                <p><strong>{{ question.answer_count }} Answer{{ question.answer_count|pluralize }}</strong></p>
                             </div>
                         </div>
                     </nav>
@@ -87,23 +87,17 @@
                         
                 
                 {% if question.resolved %}
-                    {% for answer in question.answers.all %}
-                        <div class="response {% if answer.id == question.resolved.resolving_answer.id %}resolution{% endif %}">
-                            <p>
-                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
-                                <br>
-                                <p>{{ answer.text }}</p>
-                                <div class="answer-controls">
-                                    {% if answer.star %}
-                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
-                                    {% else %}
-                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
-                                    {% endif %}
-                                </div>
-                            </p>
-                        </div>
+                    
+                    <div class="response resolution">
+                        <p>
+                            <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ question.resolved.resolving_answer.created_at }}</small>
+                            <br>
+                            <p>{{ question.resolved.resolving_answer.text }}</p>
 
-                    {% endfor %}
+                        </p>
+                    </div>
+
+                    
                 {% else %}
                         <div class="response">
                             <div class="field">
@@ -118,34 +112,6 @@
                             </div>
                         </div>
                         
-                    {% for answer in question.answers.all %}
-
-                        <div class="response">
-                            <p>
-                                <small>{{ answer.author.username }}</small> - <small>{{ answer.created_at }}</small>
-                                <br>
-                                <p>{{ answer.text }}</p>
-                                
-                                <div class="answer-controls">
-                                    {% if answer.star %}
-                                        <i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
-                                    {% else %}
-                                        <i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="{{ question.id }}"data-star="{{question.star }}"></i>
-                                    {% endif %}
-                                    
-
-                                    {% if user.id == question.author_id %}
-                                    <a class="button is-outlined is-small check" data-question="{{question.id}}" data-answer="{{answer.id}}">
-                                        <i class="fas fa-check"></i> &nbsp; Mark as Resolved
-                                    </a>
-                                    {% endif %}
-                                </div>
-                                
-
-                            </p>
-                        </div>
-
-                    {% endfor %}
 
                 {% endif %}
 
