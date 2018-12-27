@@ -14,13 +14,6 @@ function init() {
         modalBackground.addEventListener('click', toggleModal);
     }
 
-    let resolveButtons = document.querySelectorAll('.answer-controls .check');
-    if (resolveButtons) {
-        resolveButtons.forEach(function(check){
-            check.addEventListener('click', resolveQuestion);
-        });
-    }
-
 
     let questionList = document.querySelector('section#question-list');
     if (questionList) {
@@ -31,6 +24,9 @@ function init() {
             if (et && et.matches('.question-controls i')) {
                 e.stopPropagation();
                 starHandler(et);
+            } else if(et && et.matches('.answer-controls .check')) {
+                e.stopPropagation();
+                resolveQuestion(et);
                 
             } else if(et && et.matches('.submit-answer')) {
                 e.stopPropagation();
@@ -57,7 +53,7 @@ function toggleNavBar(){
 function toggleModal(){
     modal.classList.toggle('is-active');
 }
-let outeret;
+
 
 //STARRING ITEMS
 function starHandler(et) {
@@ -108,9 +104,10 @@ function toggleStar(icon){
 }
 
 //RESOLVING QUESTIONS
-function resolveQuestion(){
-    let pk = this.attributes['data-question'].value;
-    let answer = this.attributes['data-answer'].value;
+function resolveQuestion(et){
+    console.log(et);
+    let pk = et.attributes['data-question'].value;
+    let answer = et.attributes['data-answer'].value;
     console.log(pk, answer);
     $.ajax({
         method: 'POST',
