@@ -89,6 +89,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     """
     author = serializers.StringRelatedField(read_only=True)
     question = serializers.PrimaryKeyRelatedField(read_only=True)
+    resolved_answer = serializers.BooleanField(read_only=True)
     starred = serializers.SerializerMethodField()
     answer_detail_link = serializers.HyperlinkedIdentityField(
         view_name='answer-detail')
@@ -105,6 +106,7 @@ class AnswerSerializer(serializers.ModelSerializer):
                     "text",
                     "author",
                     "starred",
+                    "resolved_answer",
                     'star_count',
                     "created_at",
                     'answer_detail_link',

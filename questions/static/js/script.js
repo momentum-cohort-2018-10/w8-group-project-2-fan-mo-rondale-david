@@ -144,20 +144,32 @@ function addResolutionBlock(answer){
 function answerHTML(answer) {
     let questionAuthor = document.querySelector(
         `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
+
     return `
-    <div class="response">
-        <p>
-            <small>${answer.author}</small> - <small>${answer.created_at}</small>
-            <br>
-            ${answer.text}
-            ${answer.author === questionAuthor ? `<div class="answer-controls">
-            <a class="button is-outlined is-small check" data-question="${answer.question}" data-answer="${answer.id}">
-                <i class="fas fa-check"></i> &nbsp; Mark as Resolved
-            </a>
-            </div>` : ''}    
-        </p>
-    </div>
-`
+        <div class="response">
+            <p>
+                <small>${answer.author}</small> - <small>${answer.created_at}</small>
+                <br>
+                <p>${answer.text}</p>
+                
+                <div class="answer-controls">
+                    ${answer.starred
+                        ? `<i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="${answer.question}" data-star="${answer.starred}"></i>`
+                        : `<i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="${answer.question}"></i>`
+                    }
+
+                    ${answer.author === questionAuthor 
+                        ? `<div class="answer-controls">
+                                <a class="button is-outlined is-small check" data-question="${answer.question}" data-answer="${answer.id}">
+                                    <i class="fas fa-check"></i> &nbsp; Mark as Resolved
+                                </a>
+                            </div>` 
+                        : ''}
+                        
+                </div>
+            </p>
+        </div>
+    `
 }
 
 function submitAnswer(et) {
@@ -233,6 +245,23 @@ function removeAnswersFromPrevious(pk) {
     
 }
 
+function putResolveBack() {
+    
+}
+
+function resolveHTML(resolve) {
+    return `
+        <div class="response resolution">
+            <p>
+                <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ question.resolved.resolving_answer.created_at }}</small>
+                <br>
+                <p>{{ question.resolved.resolving_answer.text }}</p>
+            </p>
+        </div>
+    
+    `
+}
+
 //ADDING QUESTIONS
 function questionHTML(question){
     return `
@@ -268,9 +297,9 @@ function questionHTML(question){
             ${question.resolved
                 ? `<div class="response resolution">
                         <p>
-                            <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ question.resolved.resolving_answer.created_at }}</small>
+                            <small>${question.resolved.resolving_answer.author}</small> - <small>${question.resolved.resolving_answer.created_at}</small>
                             <br>
-                            <p>{{ question.resolved.resolving_answer.text }}</p>
+                            <p>${question.resolved.resolving_answer.text}</p>
                         </p>
                     </div>`
                 : `<div class="response">
