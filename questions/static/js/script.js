@@ -44,6 +44,7 @@ function init() {
     
 }
 init()
+let openQuestion;
 
 function toggleNavBar(){
     this.classList.toggle('is-active');
@@ -196,6 +197,7 @@ function loadAnswers(e) {
         method: 'GET',
         url: `/api/questions/${pk}/answers/`,
     }).done(function(response){
+        removeAnswersFromPrevious(openQuestion);
         loadAnswersInDom(response);
     }).fail(function(error){
         console.log('There was an issue getting a response');
@@ -206,12 +208,29 @@ function loadAnswers(e) {
 function loadAnswersInDom(answers) {
     if (answers[0]) {
         let questionBlock = document.querySelector(`.box.question[data-question='${answers[0].question}']`);
+        //clear resolve display
+        let resolve = questionBlock.querySelector('.resolution');
+        if (resolve) {
+            resolve.remove();
+        }
+
         let answerArea = questionBlock.querySelector(`.answer-box`);
         for (answer of answers) {
             answerArea.insertAdjacentHTML('beforeend', answerHTML(answer));
         }
-        questionBlock.removeEventListener('click', loadAnswers);
+        openQuestion = answers[0].question
     }
+}
+
+function removeAnswersFromPrevious(pk) {
+    let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
+    if (questionBlock) {
+        let responses = questionBlock.querySelectorAll('.response');
+        for (response of responses) {
+            response.remove();
+        }
+    }
+    
 }
 
 //ADDING QUESTIONS
