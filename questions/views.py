@@ -5,6 +5,9 @@ from questions.forms import EditProfileForm
 from django.views.generic.list import ListView
 from questions.models import Question, Answer
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 
 
 class QuestionListView(ListView):
@@ -51,6 +54,20 @@ class QuestionListView(ListView):
                     ))
         return context
 
+def email_one(request):
+    subject = "You've got Answers"
+    to = ['david@davidlndean.com']
+    from_email = 'questionbox18@gmail.com'
+
+    ctx = {
+        'question.author_name': 'John',
+    }
+
+    message = render_to_string('question/email/email.txt', ctx)
+
+    EmailMessage(subject, message, to=to, from_email+from_email).send()
+
+    return HttpResponse['email_one']
 
 @login_required
 def profile(request):
