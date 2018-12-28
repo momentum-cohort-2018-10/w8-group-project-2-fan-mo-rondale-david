@@ -1,3 +1,5 @@
+let apiPage = 1;
+let controller, scene;
 function init() {
     let navBar = document.querySelector('.navbar-burger');
     if (navBar) {
@@ -17,13 +19,43 @@ function init() {
 
     let questionList = document.querySelector('section#question-list');
     if (questionList) {
+        // Following code is for infinite scrolling feature
+        // init controller
+        controller = new ScrollMagic.Controller()
+        // create scene
+        scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
+                .addTo(controller)
+                .on("enter", function (e) {
+                    if (!$("#loader").hasClass("active")) {
+                        $("#loader").addClass("active");
+
+                        console.log("loading new items");
+                        loadTenQuestions()
+
+
+                    }
+                })
+
+        
+
         questionList.addEventListener('click', function(e) {
             let et = e.target;
             
-
-            if (et && et.matches('.question-controls i')) {
+            if (et && et.matches('.question-controls a[data-action="delete"] *')) {
                 e.stopPropagation();
-                starHandler(et);
+                while (!et.matches('a[data-action="delete"]')) {
+                    et = et.parentNode;
+                }
+                deleteQuestion(et);
+            } else if (et && et.matches('.answer-controls i')) {
+                e.stopPropagation();
+                starAnswerHandler(et);
+            } else if (et && et.matches('.question-controls a[data-action="star"] *')) {
+                e.stopPropagation();
+                while (!et.matches('a[data-action="star"]')) {
+                    et = et.parentNode;
+                }
+                starQuestionHandler(et);
             } else if(et && et.matches('.answer-controls .check')) {
                 e.stopPropagation();
                 resolveQuestion(et);
@@ -36,15 +68,25 @@ function init() {
                 e.stopPropagation();
                 while (!et.matches('.box.question')) {
                     et = et.parentNode;
-                 }
+                }
+                
                 loadAnswers(et);
             }
-        })
+        });
     }
     
+    // document.getElementsByClassName('delete-button').addEventListener('click', console.log('delete?'))
 }
+
 init()
-let openQuestion;
+
+function loadTenQuestions() {
+    
+    requestAQuestion(apiPage);
+    apiPage += 1;
+    
+}
+
 
 function toggleNavBar(){
     this.classList.toggle('is-active');
@@ -55,26 +97,50 @@ function toggleModal(){
     modal.classList.toggle('is-active');
 }
 
+function deleteQuestion(et) {
+    let pk = et.getAttribute('data-question');
+
+    $.ajax({
+        method: 'DELETE',
+        url: `/api/questions/${pk}/`
+    }).done(function(){
+        let questionBlock = document.querySelector(`.box.question[data-question="${pk}"]`);
+        questionBlock.remove();
+    });
+}
+
 
 //STARRING ITEMS
-function starHandler(et) {
-
+function starQuestionHandler(et) {
+    
     if (et['attributes']['data-star']) {
         let pk = et['attributes']['data-star'].value;
         unstarItem(pk);
     } else {
         let pk = et['attributes']['data-question'].value;
-        starItem(pk);
+        starItem('question', pk);
     }
 }
 
-function starItem(pk){
+function starAnswerHandler(et) {
+    if (et['attributes']['data-star']) {
+        let pk = et['attributes']['data-star'].value;
+        unstarItem(pk);
+    } else {
+        let pk = et['attributes']['data-answer'].value;
+        starItem('answer', pk);
+    }
+
+}
+
+function starItem(item, pk){
     
     $.ajax({
         method: 'POST',
-        url: `api/questions/${pk}/stars/`
+        url: `api/${item}s/${pk}/stars/`
     }).done(function(response) {
-        let star = document.querySelector(`i[data-question='${response.object_id}']`);
+        console.log('starring', response);
+        let star = document.querySelector(`a[data-action="star"][data-${item}='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
         toggleStar(star);
         console.log(response);
@@ -91,18 +157,26 @@ function unstarItem(pk){
         url: `api/stars/${pk}/`,
         dataType: 'text'
     }).done(function(response) {
-        let star = document.querySelector(`i[data-star='${pk}']`);
+        let star = document.querySelector(`a[data-star='${pk}']`);
         star.removeAttribute('data-star');
         toggleStar(star);
         
     });
 }
 
-function toggleStar(icon){
+function toggleStar(button){
+    let buttonText = button.querySelector('span');
+    console.log(button);
+    button.hasAttribute('data-star')
+        ? buttonText.innerHTML = '<span> &nbsp; Unstar</span>' 
+        : buttonText.innerHTML = '<span> &nbsp; Star</span>';
+    let icon = button.querySelector('i');
+
     icon.classList.toggle('unstarred');
     icon.classList.toggle('starred');
 
 }
+
 
 //RESOLVING QUESTIONS
 function resolveQuestion(et){
@@ -148,8 +222,9 @@ function addResolutionBlock(answer){
 
 //ADDING ANSWERS
 function answerHTML(answer, resolved) {
+    
     let questionAuthor = document.querySelector(
-        `.question[data-question='${answer.question}'] .box-information small`).firstChild.data;
+        `.question[data-question="${answer.question}"] .box-information small`).firstChild.data;
 
     return `
         <div class="response ${answer.resolved_answer
@@ -162,8 +237,8 @@ function answerHTML(answer, resolved) {
                 
                 <div class="answer-controls">
                     ${answer.starred
-                        ? `<i class="fas fa-star fa-lg starred"aria-hidden="true" data-question="${answer.question}" data-star="${answer.starred}"></i>`
-                        : `<i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-question="${answer.question}"></i>`
+                        ? `<i class="fas fa-star fa-lg starred"aria-hidden="true" data-answer="${answer.id}" data-star="${answer.starred}"></i>`
+                        : `<i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-answer="${answer.id}"></i>`
                     }
 
                     ${answer.author === questionAuthor && !resolved
@@ -179,6 +254,7 @@ function answerHTML(answer, resolved) {
         </div>
     `
 }
+
 
 function submitAnswer(et) {
     
@@ -207,18 +283,31 @@ function submitAnswer(et) {
 function addAnswer(answer) {
     let textarea = document.querySelector(`textarea[data-question='${answer.question}']`);
 
-    textarea.parentNode.parentNode.parentNode.insertAdjacentHTML('afterend', answerHTML(answer, false));
+    while (!textarea.matches('.answer-box')) {
+        textarea = textarea.parentNode;
+    }
+    console.log(textarea);
+    
+    
+    textarea.insertAdjacentHTML('beforeend', answerHTML(answer, false));
 }
 
 function loadAnswers(e) {
-
+    
     let pk = e.getAttribute('data-question');
+    
     $.ajax({
         method: 'GET',
         url: `/api/questions/${pk}/answers/`,
     }).done(function(response){
-        removeAnswersFromPrevious(openQuestion);
-        loadAnswersInDom(response);
+        
+        if (response.results[0]) {
+            
+            loadAnswersInDom(response.results);
+            
+        }
+        
+        
     }).fail(function(error){
         console.log('There was an issue getting a response');
         console.log(error);
@@ -227,32 +316,41 @@ function loadAnswers(e) {
 
 function loadAnswersInDom(answers) {
     if (answers[0]) {
-        let questionBlock = document.querySelector(`.box.question[data-question='${answers[0].question}']`);
-        //clear resolve display
-        let resolve = questionBlock.querySelector('.resolution');
-        let resolved = false;
-        if (resolve) {
-            resolve.remove();
-            resolved = true;
+        let questionBlock = document.querySelector(`.box.question[data-question="${answers[0].question}"]`);
+        
+        let answerBlocks = questionBlock.querySelectorAll('.response');
+        for (answer of answerBlocks) {
+            answer.remove()
         }
-
+        let resolved = false;
+        
+        
+        console.log(answers);
         let answerArea = questionBlock.querySelector(`.answer-box`);
         for (answer of answers) {
             
+            if (answer.resolved_answer) {
+                resolved = true;
+            }
+        }
+        
+        for (answer of answers) {
+            console.log('resolved', resolved);
             answerArea.insertAdjacentHTML('beforeend', answerHTML(answer, resolved));
         }
-        openQuestion = answers[0].question
+        
     }
 }
 
 function removeAnswersFromPrevious(pk) {
-    let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
+    let questionBlock = document.querySelector(`.box.question[data-question="${pk}"]`);
     if (questionBlock) {
         let responses = questionBlock.querySelectorAll('.response');
         
         for (response of responses) {
             response.remove();
         }
+        
         putResolveBack(pk);
         
     }
@@ -260,13 +358,13 @@ function removeAnswersFromPrevious(pk) {
 }
 
 function putResolveBack(pk) {
-    let questionBlock = document.querySelector(`.box.question[data-question='${pk}']`);
+    let questionBlock = document.querySelector(`.box.question[data-question="${pk}"]`);
 
     $.ajax({
         method: 'GET',
         url: `/api/questions/${pk}/resolve/`
     }).done(function(response) {
-        if (response[0] && (response[0].resolving_answer.question != openQuestion)) {
+        if (response[0]) {
             let answerArea = questionBlock.querySelector('.answer-box');
             
             answerArea.insertAdjacentHTML('afterbegin', answerHTML(response[0].resolving_answer, true));
@@ -293,17 +391,28 @@ function questionHTML(question){
                 </div>
                 <nav class="level is-mobile">
                     <div class="level-left question-controls">
-                        <a class="level-item" aria-label="like">
-                            <span class="icon is-medium">
-                                ${question.starred 
-                                    ? `<i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="${question.id}" data-star="${question.starred}"></i>`
-                                    : `<i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>`
-                                }
+                    ${question.starred 
+                        ? `<a class="level-item" data-action="star" data-star="${question.starred}" data-question="${question.id}" aria-label="like">
+                                <i class="fas fa-star fa-lg starred" aria-hidden="true">
+                                    </i> <span>&nbsp; Unstar</span>
+                            </a>`
+                        : `<a class="level-item" data-action="star" data-question="${question.id}" aria-label="like">
+                                <i class="fas fa-star fa-lg unstarred" aria-hidden="true">
+                                    </i> <span>&nbsp; Star</span>
+                            </a>`
+                            }
                                 
-                            </span>
-                        </a>
+                            
+                        
+                        ${question.users_question
+                            ? `<a class="level-item" data-action="delete" data-question="${question.id}" aria-label="delete">
+                                    <i class="fas fa-trash">
+                                    </i> <span>&nbsp; Delete</span>
+                                </a>`
+                            : ''}
+                        
                         <div>
-                            <p><strong>${question.answer_count} Answers</strong></p>
+                            <p><strong>${question.answer_count} ${humanizeAnswers(question.answer_count)}</strong></p>
                         </div>
                     </div>
                 </nav>
@@ -318,7 +427,7 @@ function questionHTML(question){
                             <p>${question.resolved.resolving_answer.text}</p>
                         </p>
                     </div>`
-                : `<div class="response">
+                : `<div class="response-field">
                         <div class="field">
                             <form action="">
                                 <label class="label" for="text">Respond to Question</label>
@@ -335,6 +444,14 @@ function questionHTML(question){
         </article>
     </div>
 `
+}
+
+function humanizeAnswers(num) {
+    if (num === 1) {
+        return 'Answer';
+    } else {
+        return 'Answers';
+    }
 }
 
 function postNewQuestion(){
@@ -358,84 +475,56 @@ function postNewQuestion(){
 function addQuestionToList(question){
     
     document.getElementById('question-list').insertAdjacentHTML('afterbegin', questionHTML(question));
-    document.querySelector('.question-controls i').addEventListener('click', starHandler);
+    
 }
 
 function startQuestions() {
     // click button to ask a question, opens modal with form
-    document.getElementById('ask-question').addEventListener('click', toggleModal);
-    document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
-    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
+    let questionButton = document.getElementById('ask-question');
+    if (questionButton) {
+        questionButton.addEventListener('click', toggleModal);
+    }
+
+    let questionClose = document.getElementById('new-question-cancel');
+    if (questionClose) {
+        questionClose.addEventListener('click', toggleModal);
+    }
+    
+    let questionSubmit = document.getElementById('new-question-submit');
+    if (questionSubmit) {
+        questionSubmit.addEventListener('click', postNewQuestion);
+    }
+
     setupCSRFAjax()
 }
 startQuestions()
 
+function requestAQuestion(page) {
 
-
-
-
-// Following code is for infinite scrolling feature
-
-// init controller
-var controller = new ScrollMagic.Controller()
-// create scene
-var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
-        .addTo(controller)
-        .addIndicators()
-        .on("enter", function (e) {
-            if (!$("#loader").hasClass("active")) {
-                $("#loader").addClass("active");
-                
-                console.log("loading new items");
-                loadTenQuestions()
-                
-                
-            }
-        });
-
-function loadTenQuestions() {
-    let lastQuestion = document.querySelector('section#question-list').lastElementChild.getAttribute('data-question');
-    for (let i=1; i<11; i++) {
-        let nextQuestion = lastQuestion - i;
-        if (nextQuestion < 0) {
-            $('#loader').remove();
-            
-            
-        }
-        try {
-            requestAQuestion(nextQuestion);
-        }
-        catch(error) {
-            console.log(error);
-            
-        }
-    }
-    
-}
-
-function requestAQuestion(pk) {
     $.ajax({
-        url: `/api/questions/${pk}`,
+        url: `/api/questions/?page=${page}`,
         method: 'GET',
         contentType: 'application/json'
-    }).done(function (response) {
-            console.log(response);
-            loadQuestionToDom(response);
-            
-            
-            scene.update();
-            $("#loader").removeClass("active")
+    }).done(function(response) {
+        console.log(response);
+        loadQuestionsToDom(response.results);
+        
+        scene.update();
+        $("#loader").removeClass("active")
+    }).fail(function(response) {
+        $('#loader').remove();
+
     });
 
 }
 
 
-function loadQuestionToDom(question){
-    document.getElementById('question-list').insertAdjacentHTML('beforeend', questionHTML(question));
-    document.querySelector(`.question-controls i[data-question='${question.id}']`).addEventListener('click', starHandler);
+function loadQuestionsToDom(questions){
+    for (question of questions) {
+        document.getElementById('question-list').insertAdjacentHTML('beforeend', questionHTML(question));
+    }
+    
 }
-
-startQuestions()
 
 
 function setupCSRFAjax () {

@@ -28,9 +28,9 @@
                         </div>
                         <div class="field">
                             <label class="label" for="new-question">Question Text</label>
-                                <div class="control">
-                                    <input class="input" type="text" id="new-question-text" name="text">
-                                </div>
+                            <div class="control">
+                                <textarea class="textarea" placeholder="Ask Your Question" id="new-question-text" name="text"></textarea>
+                            </div>
                         </div>
                     </form>
                         <div class="field is-grouped">
@@ -50,9 +50,13 @@
     </div>
     <section id="question-list">
 
-        {% for question in object_list %}
+        {% comment %} {% for question in object_list %}
 
+         <div id='delete-me'>
+                <button class='delete-button'>Button</button>
+                </div>
         <div class="box question" data-question="{{ question.id }}">
+        
             <article class="media">
 
                 <div class="media-content">
@@ -84,35 +88,35 @@
                             </div>
                         </div>
                     </nav>
+                    
                 </div>
                 <div class="answer-box">
                         
                 
-                {% if question.resolved %}
+                {% if question.resolved %} {% endcomment %}
                     
-                    <div class="response resolution">
+                    {% comment %} <div class="response resolution">
                         <p>
                             <small>{{ question.resolved.resolving_answer.author.username }}</small> - <small>{{ question.resolved.resolving_answer.created_at }}</small>
                             <br>
                             <p>{{ question.resolved.resolving_answer.text }}</p>
 
                         </p>
-                    </div>
+                    </div> {% endcomment %}
 
                     
-                {% else %}
-                        <div class="response">
-                            <div class="field">
-
-                                <form action="">
-                                    <label class="label" for="text">Respond to Question</label>
-                                    <textarea name="text" cols="30" rows="10" data-question="{{question.id}}" class="textarea"></textarea>
-                                </form>
-                            </div>
-                            <div class="control">
-                                <button class="button is-link submit-answer" data-question="{{question.id}}">Submit</button>
-                            </div>
+                {% comment %} {% else %}
+                    <div class="response-field">
+                        <div class="field">
+                            <form action="">
+                                <label class="label" for="text">Respond to Question</label>
+                                <textarea name="text" cols="30" rows="10" data-question="{{question.id}}" class="textarea"></textarea>
+                            </form>
                         </div>
+                        <div class="control">
+                            <button class="button is-link submit-answer" data-question="{{question.id}}">Submit</button>
+                        </div>
+                    </div>
                         
 
                 {% endif %}
@@ -122,7 +126,7 @@
         </div>
         {% empty %}
             <p>No questions yet!</p>
-        {% endfor %}
+        {% endfor %} {% endcomment %}
     </section>
     <div id="loader" style="text-align: center">
         <img style="max-width: 15%; height: auto" src="https://cdn.dribbble.com/users/69182/screenshots/2151363/animated_loading__by__amiri.gif"><br>
