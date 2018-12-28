@@ -117,7 +117,6 @@ class AnswerSerializer(serializers.ModelSerializer):
         answer = Answer.objects.get(pk=obj.pk)
         user = self.context.get('request').parser_context['request'].user
         user_star = answer.stars.filter(user=user)
-
         if user_star:
             return user_star[0].pk
         else:

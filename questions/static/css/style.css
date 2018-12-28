@@ -54,7 +54,7 @@ p.box-information {
 .response form input {
     display: block;
 }
-.response form textarea[rows] {
+.response-field form textarea[rows] {
     width: 100%;
     resize: none;
     height: 120px;
