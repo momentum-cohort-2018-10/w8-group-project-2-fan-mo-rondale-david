@@ -160,7 +160,7 @@ class QuestionAnswerList(generics.ListCreateAPIView):
         yag = Notify()
         to = question.author.email
         subject = "QuestionBox answer alert!"
-        content = self.request.user.username + "just gave an " \
+        content = self.request.user.username + " just gave an " \
             "answer to your question '" + question.title + "'"
         yag.sendemail(to, subject, content)
 
@@ -216,6 +216,8 @@ class AnswerStarList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         content_type = ContentType.objects.get(model='answer')
+        return StarredItem.objects.filter(
+            object_id=self.kwargs['pk'], content_type=content_type)
         return StarredItem.objects.filter(
             object_id=self.kwargs['pk'], content_type=content_type)
 

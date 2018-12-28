@@ -9,6 +9,7 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 
 from markdownify.templatetags.markdownify import markdownify
 
+
 class User(AbstractUser):
 
     USERNAME_FIELD = 'username'
@@ -61,7 +62,6 @@ class Answer(Timestamp):
 
     def text_as_html(self):
         return markdownify(self.text)
-        
 
 
 class Resolve(Timestamp):
