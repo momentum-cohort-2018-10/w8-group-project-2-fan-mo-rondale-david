@@ -42,14 +42,20 @@ function init() {
         questionList.addEventListener('click', function(e) {
             let et = e.target;
             
-            if (et && et.matches('a[data-action="delete"]')) {
+            if (et && et.matches('.question-controls a[data-action="delete"] *')) {
                 e.stopPropagation();
+                while (!et.matches('a[data-action="delete"]')) {
+                    et = et.parentNode;
+                }
                 deleteQuestion(et);
             } else if (et && et.matches('.answer-controls i')) {
                 e.stopPropagation();
                 starAnswerHandler(et);
-            } else if (et && et.matches('.question-controls i')) {
+            } else if (et && et.matches('.question-controls a[data-action="star"] *')) {
                 e.stopPropagation();
+                while (!et.matches('a[data-action="star"]')) {
+                    et = et.parentNode;
+                }
                 starQuestionHandler(et);
             } else if(et && et.matches('.answer-controls .check')) {
                 e.stopPropagation();
@@ -63,7 +69,7 @@ function init() {
                 e.stopPropagation();
                 while (!et.matches('.box.question')) {
                     et = et.parentNode;
-                 }
+                }
                 
                 loadAnswers(et);
             }
@@ -107,7 +113,7 @@ function deleteQuestion(et) {
 
 //STARRING ITEMS
 function starQuestionHandler(et) {
-
+    
     if (et['attributes']['data-star']) {
         let pk = et['attributes']['data-star'].value;
         unstarItem(pk);
@@ -134,7 +140,8 @@ function starItem(item, pk){
         method: 'POST',
         url: `api/${item}s/${pk}/stars/`
     }).done(function(response) {
-        let star = document.querySelector(`i[data-${item}='${response.object_id}']`);
+        console.log('starring', response);
+        let star = document.querySelector(`a[data-action="star"][data-${item}='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
         toggleStar(star);
         console.log(response);
@@ -151,18 +158,26 @@ function unstarItem(pk){
         url: `api/stars/${pk}/`,
         dataType: 'text'
     }).done(function(response) {
-        let star = document.querySelector(`i[data-star='${pk}']`);
+        let star = document.querySelector(`a[data-star='${pk}']`);
         star.removeAttribute('data-star');
         toggleStar(star);
         
     });
 }
 
-function toggleStar(icon){
+function toggleStar(button){
+    let buttonText = button.querySelector('span');
+    console.log(button);
+    button.hasAttribute('data-star')
+        ? buttonText.innerHTML = '<span> &nbsp; Unstar</span>' 
+        : buttonText.innerHTML = '<span> &nbsp; Star</span>';
+    let icon = button.querySelector('i');
+
     icon.classList.toggle('unstarred');
     icon.classList.toggle('starred');
 
 }
+
 
 //RESOLVING QUESTIONS
 function resolveQuestion(et){
@@ -377,21 +392,23 @@ function questionHTML(question){
                 </div>
                 <nav class="level is-mobile">
                     <div class="level-left question-controls">
-                        <a class="level-item" aria-label="like">
-                            
-                            ${question.starred 
-                                ? `<i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="${question.id}" data-star="${question.starred}">
-                                    </i> &nbsp; Unstar`
-                                : `<i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}">
-                                    </i> &nbsp; Star`
+                    ${question.starred 
+                        ? `<a class="level-item" data-action="star" data-star="${question.starred}" data-question="${question.id}" aria-label="like">
+                                <i class="fas fa-star fa-lg starred" aria-hidden="true">
+                                    </i> <span>&nbsp; Unstar</span>
+                            </a>`
+                        : `<a class="level-item" data-action="star" data-question="${question.id}" aria-label="like">
+                                <i class="fas fa-star fa-lg unstarred" aria-hidden="true">
+                                    </i> <span>&nbsp; Star</span>
+                            </a>`
                             }
                                 
                             
-                        </a>
+                        
                         ${question.users_question
                             ? `<a class="level-item" data-action="delete" data-question="${question.id}" aria-label="delete">
                                     <i class="fas fa-trash">
-                                    </i> &nbsp; Delete 
+                                    </i> <span>&nbsp; Delete</span>
                                 </a>`
                             : ''}
                         
