@@ -153,7 +153,7 @@ class QuestionAnswerList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         question = Question.objects.get(pk=self.kwargs['pk'])
-        return Answer.objects.filter(question=question)
+        return Answer.objects.filter(question=question).order_by('created_at')
 
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
