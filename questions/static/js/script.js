@@ -48,7 +48,7 @@ function init() {
     
 }
 init()
-let openQuestion;
+
 
 function toggleNavBar(){
     this.classList.toggle('is-active');
@@ -172,7 +172,7 @@ function answerHTML(answer, resolved) {
                                 ? 'resolution'
                                 : ''}">
             <p>
-                <small>${answer.author}</small> - <small>${answer.created_at}</small>
+                <small>${answer.author}</small> - <small>${moment(answer.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                 <br>
                 <p>${answer.text}</p>
                 
@@ -227,8 +227,10 @@ function addAnswer(answer) {
     while (!textarea.matches('.answer-box')) {
         textarea = textarea.parentNode;
     }
+    console.log(textarea);
     
-    textarea.insertAdjacentHTML('afterend', answerHTML(answer, false));
+    
+    textarea.insertAdjacentHTML('beforeend', answerHTML(answer, false));
 }
 
 function loadAnswers(e) {
@@ -240,13 +242,11 @@ function loadAnswers(e) {
         url: `/api/questions/${pk}/answers/`,
     }).done(function(response){
         
-        if (response.results[0] && (openQuestion != response.results[0].question)) {
+        if (response.results[0]) {
             
             loadAnswersInDom(response.results);
-            if (openQuestion) {
-                removeAnswersFromPrevious(openQuestion);
-            }
-            openQuestion = response.results[0].question;
+
+            
         }
         
         
@@ -260,19 +260,24 @@ function loadAnswersInDom(answers) {
     if (answers[0]) {
         let questionBlock = document.querySelector(`.box.question[data-question="${answers[0].question}"]`);
         
-        let resolve = questionBlock.querySelector('.resolution');
-        
-        let resolved = false;
-        if (resolve) {
-            resolve.remove();
-            resolved = true;
-            
+        let answerBlocks = questionBlock.querySelectorAll('.response');
+        for (answer of answerBlocks) {
+            answer.remove()
         }
+        let resolved = false;
         
+        
+        console.log(answers);
         let answerArea = questionBlock.querySelector(`.answer-box`);
-        
         for (answer of answers) {
             
+            if (answer.resolved_answer) {
+                resolved = true;
+            }
+        }
+        
+        for (answer of answers) {
+            console.log('resolved', resolved);
             answerArea.insertAdjacentHTML('beforeend', answerHTML(answer, resolved));
         }
         
