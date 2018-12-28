@@ -1,10 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey,
-    GenericRelation
-)
+from django.contrib.contenttypes.fields import (GenericForeignKey,
+                                                GenericRelation)
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail, EmailMultiAlternatives
@@ -23,14 +21,11 @@ class Timestamp(models.Model):
 
 
 class StarredItem(models.Model):
-    user = models.ForeignKey(User,
-                             on_delete=models.CASCADE,
-                             related_name='stars')
-    content_type = models.ForeignKey(ContentType,
-                                     on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='stars')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type',
-                                       'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
         unique_together = ("user", "object_id", "content_type")
@@ -52,56 +47,33 @@ class Question(Timestamp):
 class Answer(Timestamp):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
-    question = models.ForeignKey(Question,
-                                 on_delete=models.CASCADE,
-                                 null=True,
-                                 related_name='answers')
+    question = models.ForeignKey(
+        Question, on_delete=models.CASCADE, null=True, related_name='answers')
     stars = GenericRelation(StarredItem)
 
     def __str__(self):
         return f'{self.text[:20]}...'
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        email = EmailMultiAlternatives(
-            from_email='questionbox18@gmail.com',
-            to=self.question.author.email,
-            subject='You have a new answer',
-            body=f"""
-You have a new answer! {{ question.author.username }} just provided an 
-answer on your QuestionBox.
-            """
-        )
-        email.send()
-
 
 class Resolve(Timestamp):
     resolved_question = models.OneToOneField(
-        Question,
-        on_delete=models.CASCADE,
-        related_name='resolved'
-    )
+        Question, on_delete=models.CASCADE, related_name='resolved')
     resolving_answer = models.OneToOneField(
-        Answer,
-        on_delete=models.CASCADE,
-        related_name='resolved_answer'
-    )
+        Answer, on_delete=models.CASCADE, related_name='resolved_answer')
 
     def clean(self):
         self.resolved_question
         answerset = Answer.objects.filter(question=self.resolved_question)
         if self.resolving_answer not in answerset:
-            raise ValidationError(_(
-                "Resolved answers must be already be "
-                "in a question's set of answers."
-                ))
+            raise ValidationError(
+                _("Resolved answers must be already be "
+                  "in a question's set of answers."))
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(default='default.jpg',
-                              upload_to='profile_pictures')
+    image = models.ImageField(
+        default='default.jpg', upload_to='profile_pictures')
 
     def __str__(self):
         return f'{self.user.username} Profile'
