@@ -19,9 +19,7 @@ function init() {
 
     let questionList = document.querySelector('section#question-list');
     if (questionList) {
-        loadTenQuestions()
         // Following code is for infinite scrolling feature
-
         // init controller
         controller = new ScrollMagic.Controller()
         // create scene
@@ -37,8 +35,9 @@ function init() {
 
 
                     }
-                });
-            
+                })
+        loadTenQuestions();
+        
 
         questionList.addEventListener('click', function(e) {
             let et = e.target;
