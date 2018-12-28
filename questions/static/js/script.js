@@ -174,7 +174,7 @@ function answerHTML(answer, resolved) {
             <p>
                 <small>${answer.author}</small> - <small>${moment(answer.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                 <br>
-                <p>${answer.text}</p>
+                <p>${answer.text_as_html}</p>
                 
                 <div class="answer-controls">
                     ${answer.starred
@@ -329,7 +329,7 @@ function questionHTML(question){
                         <p class="box-information">
                         <small>${question.author}</small> - <small>${moment(question.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                         </p>
-                        ${question.text}
+                        ${question.text_as_html}
                 </div>
                 <nav class="level is-mobile">
                     <div class="level-left question-controls">

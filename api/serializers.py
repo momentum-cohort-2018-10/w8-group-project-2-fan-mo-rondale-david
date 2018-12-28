@@ -110,7 +110,8 @@ class AnswerSerializer(serializers.ModelSerializer):
                     'star_count',
                     "created_at",
                     'answer_detail_link',
-                    'star_list_link'
+                    'star_list_link',
+                    'text_as_html'
                 )
 
     def get_starred(self, obj):
@@ -172,8 +173,8 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'question_detail_link',
                     'question_resolution_link',
                     'answer_list_link',
-                    'star_list_link'
-
+                    'star_list_link',
+                    'text_as_html'
                   )
 
     def create(self, validated_data):
