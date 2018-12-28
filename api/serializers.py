@@ -139,7 +139,8 @@ class DetailedAnswerResolveSerializer(serializers.ModelSerializer):
         return Resolve.objects.create(**validated_data)
 
 
-class QuestionSerializer(serializers.ModelSerializer):
+class QuestionSerializer(serializers.ModelSerializer): 
+    breakpoint()
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
     starred = serializers.SerializerMethodField()
@@ -188,3 +189,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             return user_star[0].pk
         else:
             return 0
+
+    # def delete(self, validated_data):
+    #     return Question.objects.delete(**validated_data)

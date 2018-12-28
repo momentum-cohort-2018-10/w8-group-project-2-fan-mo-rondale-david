@@ -286,6 +286,7 @@ function questionHTML(question){
             <div class="media-content">
                 <div class="content">
                     <h2>${question.title}</h2>
+                    <button id='delete-question'>Delete</button>
                         <p class="box-information">
                         <small>${question.author}</small> - <small>${moment(question.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                         </p>
@@ -335,6 +336,19 @@ function questionHTML(question){
         </article>
     </div>
 `
+}
+
+document.getElementById('delete-question').addEventListener('click', function () {
+    event.preventDefault(); console.log('halp')})
+
+console.log("did we make it here?")
+function DeleteQuestion(pk){
+    console.log('are we here?')
+    event.preventDefault();
+    $.ajax({
+        method: 'DELETE',
+        url: `/api/questions/${pk}/`
+    })
 }
 
 function postNewQuestion(){

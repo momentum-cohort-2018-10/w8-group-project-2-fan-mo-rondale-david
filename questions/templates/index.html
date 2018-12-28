@@ -43,9 +43,9 @@
                         </div>
                 </div>
              </div>
-        </div>
-            
+        </div>     
     </div>
+
     <section id="question-list">
 
         {% for question in object_list %}
@@ -58,8 +58,12 @@
                         <h2>{{ question.title }}</h2>
                             <p class="box-information">
                             <small>{{ question.author_name }}</small> - <small>{{ question.created_at }}</small>
+                            
+                            {% comment %} <div class="delete-button"> {% endcomment %}
+                                {% comment %} {% if request.user === question.author %} {% endcomment %}
+                                <button id='delete-question'>Delete</button>
+                                {% comment %} {% endif %} {% endcomment %}
                             </p>
-
                             {{ question.text }}
 
                     </div>
