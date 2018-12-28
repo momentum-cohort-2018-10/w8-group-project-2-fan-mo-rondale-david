@@ -2,6 +2,29 @@ from questions.models import StarredItem, Question, User, Answer, Resolve
 from rest_framework import serializers
 
 
+class StarredItemSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    object_id = serializers.IntegerField(read_only=True)
+    content_type = serializers.SlugRelatedField(
+        slug_field='model',
+        read_only=True)
+
+    star_link = serializers.HyperlinkedIdentityField(view_name='star-detail')
+
+    class Meta:
+        model = StarredItem
+        fields = (
+                    'pk', 
+                    'user', 
+                    'object_id', 
+                    'content_type', 
+                    'star_link'
+                )
+
+    def create(self, validated_data):
+        return StarredItem.objects.create(**validated_data)
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     user_link = serializers.HyperlinkedIdentityField(view_name='user-detail')
     user_question_link = serializers.HyperlinkedIdentityField(
@@ -10,16 +33,19 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     user_answer_link = serializers.HyperlinkedIdentityField(
         view_name='answer-list-by-user'
     )
+    user_starred = StarredItemSerializer(read_only=True, many=True)
 
     class Meta:
         model = User
         fields = (
+            'pk',
             'username',
             'email',
             'is_staff',
             'user_link',
             'user_question_link',
-            'user_answer_link'
+            'user_answer_link',
+            'user_starred'
             )
 
 
@@ -64,23 +90,6 @@ class ResolveSerializer(serializers.ModelSerializer):
             )
         self.fields['resolving_answer'].queryset = Answer.objects.filter(
             question=question)
-
-
-class StarredItemSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    object_id = serializers.IntegerField(read_only=True)
-    content_type = serializers.SlugRelatedField(
-        slug_field='model',
-        read_only=True)
-
-    star_link = serializers.HyperlinkedIdentityField(view_name='star-detail')
-
-    class Meta:
-        model = StarredItem
-        fields = ('pk', 'user', 'object_id', 'content_type', 'star_link')
-
-    def create(self, validated_data):
-        return StarredItem.objects.create(**validated_data)
 
 
 class AnswerSerializer(serializers.ModelSerializer):

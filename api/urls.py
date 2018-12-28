@@ -12,6 +12,11 @@ urlpatterns = [
     path('my-answers/',
          api_views.UserAnswerListView.as_view(),
          name='user-answer-list'),
+
+    path('my-starred/',
+         api_views.UserStarredItemListView.as_view(),
+         name='user-starred-list'),
+
     path('users/<pk>/',
          api_views.UserDetailView.as_view(),
          name='user-detail'),
@@ -21,6 +26,11 @@ urlpatterns = [
     path('users/<pk>/answers/',
          api_views.AnswersByUserListView.as_view(),
          name='answer-list-by-user'),
+
+     path('stars/',
+         api_views.StarredItemListView.as_view(),
+         name='star-list'),
+
     path('stars/<pk>/',
          api_views.StarredItemDetail.as_view(),
          name='star-detail'),

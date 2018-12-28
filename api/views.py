@@ -78,6 +78,24 @@ class UserAnswerListView(generics.ListAPIView):
         return Answer.objects.filter(author=user)
 
 
+class UserStarredItemListView(generics.ListAPIView):
+    """
+    Retrieves user's list of starred items
+    """
+    serializer_class = StarredItemSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return StarredItem.objects.filter(user=user)
+
+
+class StarredItemListView(generics.ListAPIView):
+    """
+    Retrieves list of starred items
+    """
+    queryset = StarredItem.objects.all()
+    serializer_class = StarredItemSerializer
+
 class StarredItemDetail(generics.RetrieveDestroyAPIView):
     """
     Retrieves details of starred item

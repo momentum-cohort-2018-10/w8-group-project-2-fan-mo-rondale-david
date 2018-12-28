@@ -14,6 +14,7 @@ function init() {
     // });
     document.querySelector("li[data-target='pane-1']").addEventListener('click', getUserQuestions);
     document.querySelector("li[data-target='pane-2']").addEventListener('click', getUserAnswers);
+    document.querySelector("li[data-target='pane-3']").addEventListener('click', getUserStarredQuestions);
     
     let navBar = document.querySelector('.navbar-burger');
     if (navBar) {
@@ -464,6 +465,21 @@ function addAnswersToProfile(answers){
     }
 }
 
+
+function getUserStarredQuestions() {
+    console.log(this);
+    $.ajax({
+        method: 'GET', 
+        url: "/api/my-starred/"
+    }).done(function(response){
+        console.log(response);
+        document.querySelector('.tile.is-child.box').innerHTML = "";
+        addQuestionsToProfile(response)
+    }).fail(function(response){
+        console.log("There was an issue gettting the user's starred questions.");
+        console.log(response);
+    })
+}
 
 function csrfSafeMethod(method){
 // these HTTP methods do not require CSRF protection
