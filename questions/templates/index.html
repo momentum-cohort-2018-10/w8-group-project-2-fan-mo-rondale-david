@@ -61,7 +61,8 @@
                             
                             {% comment %} <div class="delete-button"> {% endcomment %}
                                 {% comment %} {% if request.user === question.author %} {% endcomment %}
-                                <button id='delete-question'>Delete</button>
+                                <div class="delete-button">
+                                <button id='delete-question' data-question="{{ question.id }}">Delete</button></div>
                                 {% comment %} {% endif %} {% endcomment %}
                             </p>
                             {{ question.text }}

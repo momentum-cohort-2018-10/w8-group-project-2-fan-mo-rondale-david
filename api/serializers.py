@@ -140,7 +140,6 @@ class DetailedAnswerResolveSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer): 
-    breakpoint()
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
     starred = serializers.SerializerMethodField()

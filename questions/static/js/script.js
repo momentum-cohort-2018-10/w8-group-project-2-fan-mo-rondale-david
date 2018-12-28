@@ -15,32 +15,34 @@ function init() {
     }
 
 
-    let questionList = document.querySelector('section#question-list');
-    if (questionList) {
-        questionList.addEventListener('click', function(e) {
-            let et = e.target;
+    // let questionList = document.querySelector('section#question-list');
+    // if (questionList) {
+    //     questionList.addEventListener('click', function(e) {
+    //         let et = e.target;
             
 
-            if (et && et.matches('.question-controls i')) {
-                e.stopPropagation();
-                starHandler(et);
-            } else if(et && et.matches('.answer-controls .check')) {
-                e.stopPropagation();
-                resolveQuestion(et);
+    //         if (et && et.matches('.question-controls i')) {
+    //             e.stopPropagation();
+    //             starHandler(et);
+    //         } else if(et && et.matches('.answer-controls .check')) {
+    //             e.stopPropagation();
+    //             resolveQuestion(et);
                 
-            } else if(et && et.matches('.submit-answer')) {
-                e.stopPropagation();
-                submitAnswer(et);
+    //         } else if(et && et.matches('.submit-answer')) {
+    //             e.stopPropagation();
+    //             submitAnswer(et);
                 
-            } else if(et && et.matches('.box.question, .box.question *')) {
-                e.stopPropagation();
-                while (!et.matches('.box.question')) {
-                    et = et.parentNode;
-                 }
-                loadAnswers(et);
-            }
-        })
-    }
+    //         } else if(et && et.matches('.box.question, .box.question *')) {
+    //             e.stopPropagation();
+    //             while (!et.matches('.box.question')) {
+    //                 et = et.parentNode;
+    //              }
+    //             loadAnswers(et);
+    //         }
+    //     })
+    // }
+    document.querySelectorAll('.delete-button').forEach(function(button) {
+        button.addEventListener('click', deleteQuestion)})
     
 }
 init()
@@ -286,7 +288,8 @@ function questionHTML(question){
             <div class="media-content">
                 <div class="content">
                     <h2>${question.title}</h2>
-                    <button id='delete-question'>Delete</button>
+                    <div class="delete-button">
+                    <button id='delete-question' data-question="${question.id}">Delete</button></div>
                         <p class="box-information">
                         <small>${question.author}</small> - <small>${moment(question.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                         </p>
@@ -338,18 +341,35 @@ function questionHTML(question){
 `
 }
 
-document.getElementById('delete-question').addEventListener('click', function () {
-    event.preventDefault(); console.log('halp')})
+// document.getElementById('delete-question').addEventListener('click', function () {
+//     event.preventDefault(); console.log('halp')})
 
-console.log("did we make it here?")
-function DeleteQuestion(pk){
-    console.log('are we here?')
-    event.preventDefault();
-    $.ajax({
-        method: 'DELETE',
-        url: `/api/questions/${pk}/`
-    })
-}
+
+function deleteQuestion(pk) {
+    console.log('line 348')
+    pk = this.getAttribute('data-question');
+    console.log((pk))
+        $.ajax({
+            method: 'DELETE',
+            url: `/api/questions/${pk}/`
+        }).done(function(response) {
+            console.log(response);
+        });
+    }
+    
+    
+    
+    
+    
+// console.log("did we make it here?")
+// function DeleteQuestion(pk){
+//     console.log('are we here?')
+//     event.preventDefault();
+//     $.ajax({
+//         method: 'DELETE',
+//         url: `/api/questions/${pk}/`
+//     })
+// }
 
 function postNewQuestion(){
     let question = {
