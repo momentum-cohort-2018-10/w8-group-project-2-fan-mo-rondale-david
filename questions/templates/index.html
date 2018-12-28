@@ -52,7 +52,11 @@
 
         {% comment %} {% for question in object_list %}
 
+         <div id='delete-me'>
+                <button class='delete-button'>Button</button>
+                </div>
         <div class="box question" data-question="{{ question.id }}">
+        
             <article class="media">
 
                 <div class="media-content">
@@ -84,6 +88,7 @@
                             </div>
                         </div>
                     </nav>
+                    
                 </div>
                 <div class="answer-box">
                         

@@ -68,7 +68,9 @@ function init() {
         })
     }
     
+    // document.getElementsByClassName('delete-button').addEventListener('click', console.log('delete?'))
 }
+
 init()
 
 function loadTenQuestions() {
@@ -87,6 +89,14 @@ function toggleNavBar(){
 function toggleModal(){
     modal.classList.toggle('is-active');
 }
+
+function deleteQuestion(pk) {
+    console.log((pk))
+        $.ajax({
+            method: 'DELETE',
+            url: `/api/questions/${pk}`
+        })
+    }
 
 
 //STARRING ITEMS
