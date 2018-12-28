@@ -158,16 +158,19 @@ class QuestionAnswerList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
         serializer.save(author=self.request.user, question=question)
-        if settings.DEBUG:
-            yag = Notify()
-            to = question.author.email
-            if to:
-                subject = "QuestionBox answer alert!"
-                content = self.request.user.username + " just gave an " \
-                    "answer to your question '" + question.title + "'" \
-                    "View your questions on your userprofile here " \
-                    "https://afternoon-fjord-67146.herokuapp.com/userprofile/"
+
+        yag = Notify()
+        to = question.author.email
+        if to:
+            subject = "QuestionBox answer alert!"
+            content = self.request.user.username + " just gave an " \
+                "answer to your question '" + question.title + "'" \
+                "View your questions on your userprofile here " \
+                "https://afternoon-fjord-67146.herokuapp.com/userprofile/"
+            try:
                 yag.sendemail(to, subject, content)
+            except Exception as e:
+                print(e)
 
 
 class QuestionStarList(generics.ListCreateAPIView):
