@@ -74,8 +74,7 @@ function init() {
             }
         });
     }
-    
-    // document.getElementsByClassName('delete-button').addEventListener('click', console.log('delete?'))
+
 }
 
 init()
@@ -139,11 +138,11 @@ function starItem(item, pk){
         method: 'POST',
         url: `api/${item}s/${pk}/stars/`
     }).done(function(response) {
-        console.log('starring', response);
+        
         let star = document.querySelector(`a[data-action="star"][data-${item}='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
         toggleStar(star);
-        console.log(response);
+        
     }).fail(function(response) {
         console.log("There was an error making the star");
         console.log(response);
@@ -166,7 +165,7 @@ function unstarItem(pk){
 
 function toggleStar(button){
     let buttonText = button.querySelector('span');
-    console.log(button);
+
     button.hasAttribute('data-star')
         ? buttonText.innerHTML = '<span> &nbsp; Unstar</span>' 
         : buttonText.innerHTML = '<span> &nbsp; Star</span>';
@@ -191,11 +190,10 @@ function resolveQuestion(et){
             resolving_answer: answer
         }
     }).done(function(response){
-        console.log(response);
         addResolutionBlock(response.resolving_answer);
         removeResolveButtons(response.resolved_question);
         
-        console.log(response);
+        
     }).fail(function(response){
         console.log('There was an error resolving this question');
         console.log(response);
@@ -286,8 +284,12 @@ function addAnswer(answer) {
     while (!textarea.matches('.answer-box')) {
         textarea = textarea.parentNode;
     }
-    console.log(textarea);
     
+    let count = document.querySelector(`.box.question[data-question='${answer.question}'] strong.count`);
+    let newCount = count.innerText.split(" ");
+    newCount[0] = parseInt(newCount[0]) + 1;
+    newCount[1] = humanizeAnswers(newCount[0]);
+    count.innerText = newCount.join(" ");
     
     textarea.insertAdjacentHTML('beforeend', answerHTML(answer, false));
 }
@@ -325,7 +327,7 @@ function loadAnswersInDom(answers) {
         let resolved = false;
         
         
-        console.log(answers);
+        
         let answerArea = questionBlock.querySelector(`.answer-box`);
         for (answer of answers) {
             
@@ -335,7 +337,7 @@ function loadAnswersInDom(answers) {
         }
         
         for (answer of answers) {
-            console.log('resolved', resolved);
+            
             answerArea.insertAdjacentHTML('beforeend', answerHTML(answer, resolved));
         }
         
@@ -412,7 +414,7 @@ function questionHTML(question){
                             : ''}
                         
                         <div>
-                            <p><strong>${question.answer_count} ${humanizeAnswers(question.answer_count)}</strong></p>
+                            <p><strong class="count">${question.answer_count} ${humanizeAnswers(question.answer_count)}</strong></p>
                         </div>
                     </div>
                 </nav>
@@ -506,7 +508,7 @@ function requestAQuestion(page) {
         method: 'GET',
         contentType: 'application/json'
     }).done(function(response) {
-        console.log(response);
+        
         loadQuestionsToDom(response.results);
         
         scene.update();
