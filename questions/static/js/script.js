@@ -1,3 +1,5 @@
+let apiPage = 1;
+let controller, scene;
 function init() {
     let navBar = document.querySelector('.navbar-burger');
     if (navBar) {
@@ -17,6 +19,27 @@ function init() {
 
     let questionList = document.querySelector('section#question-list');
     if (questionList) {
+        loadTenQuestions()
+        // Following code is for infinite scrolling feature
+
+        // init controller
+        controller = new ScrollMagic.Controller()
+        // create scene
+        scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
+                .addTo(controller)
+                .addIndicators()
+                .on("enter", function (e) {
+                    if (!$("#loader").hasClass("active")) {
+                        $("#loader").addClass("active");
+
+                        console.log("loading new items");
+                        loadTenQuestions()
+
+
+                    }
+                });
+            
+
         questionList.addEventListener('click', function(e) {
             let et = e.target;
             
@@ -48,6 +71,13 @@ function init() {
     
 }
 init()
+
+function loadTenQuestions() {
+    
+    requestAQuestion(apiPage);
+    apiPage += 1;
+    
+}
 
 
 function toggleNavBar(){
@@ -245,7 +275,6 @@ function loadAnswers(e) {
         if (response.results[0]) {
             
             loadAnswersInDom(response.results);
-
             
         }
         
@@ -411,43 +440,24 @@ function addQuestionToList(question){
 
 function startQuestions() {
     // click button to ask a question, opens modal with form
-    document.getElementById('ask-question').addEventListener('click', toggleModal);
-    document.getElementById('new-question-cancel').addEventListener('click', toggleModal);
-    document.getElementById('new-question-submit').addEventListener('click', postNewQuestion);
+    let questionButton = document.getElementById('ask-question');
+    if (questionButton) {
+        questionButton.addEventListener('click', toggleModal);
+    }
+
+    let questionClose = document.getElementById('new-question-cancel');
+    if (questionClose) {
+        questionClose.addEventListener('click', toggleModal);
+    }
+    
+    let questionSubmit = document.getElementById('new-question-submit');
+    if (questionSubmit) {
+        questionSubmit.addEventListener('click', postNewQuestion);
+    }
+
     setupCSRFAjax()
 }
 startQuestions()
-
-
-
-
-
-// Following code is for infinite scrolling feature
-
-// init controller
-var controller = new ScrollMagic.Controller()
-// create scene
-var scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
-        .addTo(controller)
-        .addIndicators()
-        .on("enter", function (e) {
-            if (!$("#loader").hasClass("active")) {
-                $("#loader").addClass("active");
-                
-                console.log("loading new items");
-                loadTenQuestions()
-                
-                
-            }
-        });
-let apiPage = 1;
-function loadTenQuestions() {
-
-    requestAQuestion(apiPage);
-    apiPage += 1;
-    
-}
-loadTenQuestions()
 
 function requestAQuestion(page) {
 
@@ -475,8 +485,6 @@ function loadQuestionsToDom(questions){
     }
     
 }
-
-startQuestions()
 
 
 function setupCSRFAjax () {
