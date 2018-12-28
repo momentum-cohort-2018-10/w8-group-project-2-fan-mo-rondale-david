@@ -25,7 +25,6 @@ function init() {
         // create scene
         scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
                 .addTo(controller)
-                .addIndicators()
                 .on("enter", function (e) {
                     if (!$("#loader").hasClass("active")) {
                         $("#loader").addClass("active");
@@ -36,18 +35,26 @@ function init() {
 
                     }
                 })
-        loadTenQuestions();
+
         
 
         questionList.addEventListener('click', function(e) {
             let et = e.target;
             
-            
-            if (et && et.matches('.answer-controls i')) {
+            if (et && et.matches('.question-controls a[data-action="delete"] *')) {
+                e.stopPropagation();
+                while (!et.matches('a[data-action="delete"]')) {
+                    et = et.parentNode;
+                }
+                deleteQuestion(et);
+            } else if (et && et.matches('.answer-controls i')) {
                 e.stopPropagation();
                 starAnswerHandler(et);
-            } else if (et && et.matches('.question-controls i')) {
+            } else if (et && et.matches('.question-controls a[data-action="star"] *')) {
                 e.stopPropagation();
+                while (!et.matches('a[data-action="star"]')) {
+                    et = et.parentNode;
+                }
                 starQuestionHandler(et);
             } else if(et && et.matches('.answer-controls .check')) {
                 e.stopPropagation();
@@ -61,14 +68,16 @@ function init() {
                 e.stopPropagation();
                 while (!et.matches('.box.question')) {
                     et = et.parentNode;
-                 }
+                }
                 
                 loadAnswers(et);
             }
-        })
+        });
     }
     
+    // document.getElementsByClassName('delete-button').addEventListener('click', console.log('delete?'))
 }
+
 init()
 
 function loadTenQuestions() {
@@ -88,10 +97,22 @@ function toggleModal(){
     modal.classList.toggle('is-active');
 }
 
+function deleteQuestion(et) {
+    let pk = et.getAttribute('data-question');
+
+    $.ajax({
+        method: 'DELETE',
+        url: `/api/questions/${pk}/`
+    }).done(function(){
+        let questionBlock = document.querySelector(`.box.question[data-question="${pk}"]`);
+        questionBlock.remove();
+    });
+}
+
 
 //STARRING ITEMS
 function starQuestionHandler(et) {
-
+    
     if (et['attributes']['data-star']) {
         let pk = et['attributes']['data-star'].value;
         unstarItem(pk);
@@ -118,7 +139,8 @@ function starItem(item, pk){
         method: 'POST',
         url: `api/${item}s/${pk}/stars/`
     }).done(function(response) {
-        let star = document.querySelector(`i[data-${item}='${response.object_id}']`);
+        console.log('starring', response);
+        let star = document.querySelector(`a[data-action="star"][data-${item}='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
         toggleStar(star);
         console.log(response);
@@ -135,18 +157,26 @@ function unstarItem(pk){
         url: `api/stars/${pk}/`,
         dataType: 'text'
     }).done(function(response) {
-        let star = document.querySelector(`i[data-star='${pk}']`);
+        let star = document.querySelector(`a[data-star='${pk}']`);
         star.removeAttribute('data-star');
         toggleStar(star);
         
     });
 }
 
-function toggleStar(icon){
+function toggleStar(button){
+    let buttonText = button.querySelector('span');
+    console.log(button);
+    button.hasAttribute('data-star')
+        ? buttonText.innerHTML = '<span> &nbsp; Unstar</span>' 
+        : buttonText.innerHTML = '<span> &nbsp; Star</span>';
+    let icon = button.querySelector('i');
+
     icon.classList.toggle('unstarred');
     icon.classList.toggle('starred');
 
 }
+
 
 //RESOLVING QUESTIONS
 function resolveQuestion(et){
@@ -361,15 +391,26 @@ function questionHTML(question){
                 </div>
                 <nav class="level is-mobile">
                     <div class="level-left question-controls">
-                        <a class="level-item" aria-label="like">
-                            <span class="icon is-medium">
-                                ${question.starred 
-                                    ? `<i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="${question.id}" data-star="${question.starred}"></i>`
-                                    : `<i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>`
-                                }
+                    ${question.starred 
+                        ? `<a class="level-item" data-action="star" data-star="${question.starred}" data-question="${question.id}" aria-label="like">
+                                <i class="fas fa-star fa-lg starred" aria-hidden="true">
+                                    </i> <span>&nbsp; Unstar</span>
+                            </a>`
+                        : `<a class="level-item" data-action="star" data-question="${question.id}" aria-label="like">
+                                <i class="fas fa-star fa-lg unstarred" aria-hidden="true">
+                                    </i> <span>&nbsp; Star</span>
+                            </a>`
+                            }
                                 
-                            </span>
-                        </a>
+                            
+                        
+                        ${question.users_question
+                            ? `<a class="level-item" data-action="delete" data-question="${question.id}" aria-label="delete">
+                                    <i class="fas fa-trash">
+                                    </i> <span>&nbsp; Delete</span>
+                                </a>`
+                            : ''}
+                        
                         <div>
                             <p><strong>${question.answer_count} ${humanizeAnswers(question.answer_count)}</strong></p>
                         </div>
