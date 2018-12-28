@@ -18,6 +18,7 @@ yagmail = "*"
 keyring = "*"
 markdown = "*"
 django-markdownify = "*"
+keyrings-alt = "*"
 
 [dev-packages]
 "flake8" = "*"
