@@ -72,3 +72,7 @@ i.starred {
     max-width: 20%;
 
 }
+
+.modal-content .field.is-grouped {
+    margin-top: 20px;
+}

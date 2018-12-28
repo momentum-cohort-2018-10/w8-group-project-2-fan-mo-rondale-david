@@ -117,11 +117,13 @@ class AnswerSerializer(serializers.ModelSerializer):
     def get_starred(self, obj):
         answer = Answer.objects.get(pk=obj.pk)
         user = self.context.get('request').parser_context['request'].user
-        user_star = answer.stars.filter(user=user)
-        if user_star:
-            return user_star[0].pk
-        else:
-            return 0
+
+        if user.is_authenticated:
+            user_star = answer.stars.filter(user=user)
+            if user_star:
+                return user_star[0].pk
+
+        return 0
 
 
 class DetailedAnswerResolveSerializer(serializers.ModelSerializer):
@@ -144,6 +146,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                                           read_only=True)
     starred = serializers.SerializerMethodField()
     resolved = DetailedAnswerResolveSerializer(read_only=True)
+    users_question = serializers.SerializerMethodField()
 
     question_resolution_link = serializers.HyperlinkedIdentityField(
         view_name='question-resolution'
@@ -168,6 +171,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'text',
                     'starred',
                     'resolved',
+                    'users_question',
                     'answer_count',
                     'star_count',
                     'question_detail_link',
@@ -183,8 +187,16 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_starred(self, obj):
         question = Question.objects.get(pk=obj.pk)
         user = self.context.get('request').parser_context['request'].user
-        user_star = question.stars.filter(user=user)
-        if user_star:
-            return user_star[0].pk
-        else:
-            return 0
+
+        if user.is_authenticated:
+            user_star = question.stars.filter(user=user)
+            if user_star:
+                return user_star[0].pk
+
+        return 0
+
+    def get_users_question(self, obj):
+        question = Question.objects.get(pk=obj.pk)
+        user = self.context.get('request').parser_context['request'].user
+
+        return question.author == user

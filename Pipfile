@@ -14,8 +14,11 @@ pillow = "*"
 gunicorn = "*"
 django-heroku = "*"
 django-debug-toolbar = "*"
+yagmail = "*"
+keyring = "*"
 markdown = "*"
 django-markdownify = "*"
+keyrings-alt = "*"
 
 [dev-packages]
 "flake8" = "*"

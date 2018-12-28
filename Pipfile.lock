@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1d7844ce3b1107557e2c21c4b7ea25feebc24f8f11b8a0728ed1edf4a5a6b9a3"
+            "sha256": "8d435e42ced2b7bd1383905a4fb7192907616c4a0712ab4cdd78d51c9679c863"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -84,6 +84,13 @@
             "index": "pypi",
             "version": "==3.9.0"
         },
+        "entrypoints": {
+            "hashes": [
+                "sha256:10ad569bb245e7e2ba425285b9fa3e8178a0dc92fc53b1e1c553805e15a8825b",
+                "sha256:d2d587dde06f99545fb13a383d2cd336a8ff1f359c5839ce3a64c917d10c029f"
+            ],
+            "version": "==0.2.3"
+        },
         "faker": {
             "hashes": [
                 "sha256:228419b0a788a7ac867ebfafdd438461559ab1a0975edb607300852d9acaa78d",
@@ -99,6 +106,21 @@
             ],
             "index": "pypi",
             "version": "==19.9.0"
+        },
+        "keyring": {
+            "hashes": [
+                "sha256:8f683fa6c8886da58b28c7d8e3819b1a4bf193741888e33a6e00944b673a22cf",
+                "sha256:d71368b9a10dc096c8a1b69a46fc23f0a551f709b9a55b4d4deb7d2fbd809b68"
+            ],
+            "index": "pypi",
+            "version": "==17.1.1"
+        },
+        "keyrings-alt": {
+            "hashes": [
+                "sha256:5fe5631e333c6134615689285ef92a0db96fb6eab6cd350c08b7b661d708bd1b"
+            ],
+            "index": "pypi",
+            "version": "==3.1.1"
         },
         "markdown": {
             "hashes": [
@@ -228,6 +250,14 @@
                 "sha256:42133ddd5229eeb6a0c9899496bdbe56c292394bf8666da77deeb27454c0456a"
             ],
             "version": "==4.1.2"
+        },
+        "yagmail": {
+            "hashes": [
+                "sha256:41a19198a60f454628b1fb948d1f8b38ddeea5802f677699c3ce5265e3d9f748",
+                "sha256:a93efe034ef83e32a17c8888c5eec1568f7350a5918199548d31fff643bee83e"
+            ],
+            "index": "pypi",
+            "version": "==0.11.214"
         }
     },
     "develop": {
