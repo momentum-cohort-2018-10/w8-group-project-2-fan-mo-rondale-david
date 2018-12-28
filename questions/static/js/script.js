@@ -48,48 +48,61 @@ function init() {
         
 
         questionList.addEventListener('click', function(e) {
-            let et = e.target;
             
-            if (et && et.matches('.question-controls a[data-action="delete"] *')) {
-                e.stopPropagation();
-                while (!et.matches('a[data-action="delete"]')) {
-                    et = et.parentNode;
-                }
-                deleteQuestion(et);
-            } else if (et && et.matches('.answer-controls a[data-action="star"] *')) {
-                e.stopPropagation();
-                while (!et.matches('a[data-action="star"]')) {
-                    et = et.parentNode;
-                }
-                starAnswerHandler(et);
-            } else if (et && et.matches('.question-controls a[data-action="star"] *')) {
-                e.stopPropagation();
-                while (!et.matches('a[data-action="star"]')) {
-                    et = et.parentNode;
-                }
-                starQuestionHandler(et);
-            } else if(et && et.matches('.answer-controls .check')) {
-                e.stopPropagation();
-                resolveQuestion(et);
-                
-            } else if(et && et.matches('.submit-answer')) {
-                e.stopPropagation();
-                submitAnswer(et);
-                
-            } else if(et && et.matches('.box.question, .box.question *')) {
-                e.stopPropagation();
-                while (!et.matches('.box.question')) {
-                    et = et.parentNode;
-                }
-                
-                loadAnswers(et);
-            }
+            setUpQuestionListeners(e);
+            
         });
+    }
+
+    let profileView = document.querySelector('.tile.is-parent');
+    if (profileView) {
+        profileView.addEventListener('click', function(e){
+            setUpQuestionListeners(e,);
+        })
     }
 
 }
 
 init()
+
+function setUpQuestionListeners(e) {
+    let et = e.target;
+
+    if (et && et.matches('.question-controls a[data-action="delete"] *')) {
+        e.stopPropagation();
+        while (!et.matches('a[data-action="delete"]')) {
+            et = et.parentNode;
+        }
+        deleteQuestion(et);
+    } else if (et && et.matches('.answer-controls a[data-action="star"] *')) {
+        e.stopPropagation();
+        while (!et.matches('a[data-action="star"]')) {
+            et = et.parentNode;
+        }
+        starAnswerHandler(et);
+    } else if (et && et.matches('.question-controls a[data-action="star"] *')) {
+        e.stopPropagation();
+        while (!et.matches('a[data-action="star"]')) {
+            et = et.parentNode;
+        }
+        starQuestionHandler(et);
+    } else if(et && et.matches('.answer-controls .check')) {
+        e.stopPropagation();
+        resolveQuestion(et);
+        
+    } else if(et && et.matches('.submit-answer')) {
+        e.stopPropagation();
+        submitAnswer(et);
+        
+    } else if(et && et.matches('.box.question, .box.question *')) {
+        e.stopPropagation();
+        while (!et.matches('.box.question')) {
+            et = et.parentNode;
+        }
+        
+        loadAnswers(et);
+    }
+}
 
 function loadTenQuestions() {
     
@@ -148,7 +161,7 @@ function starItem(item, pk){
     
     $.ajax({
         method: 'POST',
-        url: `api/${item}s/${pk}/stars/`
+        url: `/api/${item}s/${pk}/stars/`
     }).done(function(response) {
         console.log(response);
         let star = document.querySelector(`a[data-action="star"][data-${item}='${response.object_id}']`);
@@ -165,7 +178,7 @@ function unstarItem(pk){
     
     $.ajax({
         method: 'DELETE',
-        url: `api/stars/${pk}/`,
+        url: `/api/stars/${pk}/`,
         dataType: 'text'
     }).done(function(response) {
         console.log(response);
