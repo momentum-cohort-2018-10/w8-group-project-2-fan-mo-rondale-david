@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         yag = Notify()
-        to = "david@davidlndean.com"
+        to = "fan.huang.33@gmail.com"
         subject = "Test from Yag"
         content = "Some message content"
         yag.sendemail(to, subject, content)

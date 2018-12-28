@@ -159,10 +159,11 @@ class QuestionAnswerList(generics.ListCreateAPIView):
         serializer.save(author=self.request.user, question=question)
         yag = Notify()
         to = question.author.email
-        subject = "QuestionBox answer alert!"
-        content = self.request.user.username + " just gave an " \
-            "answer to your question '" + question.title + "'"
-        yag.sendemail(to, subject, content)
+        if to:
+            subject = "QuestionBox answer alert!"
+            content = self.request.user.username + " just gave an " \
+                "answer to your question '" + question.title + "'"
+            yag.sendemail(to, subject, content)
 
 
 class QuestionStarList(generics.ListCreateAPIView):
