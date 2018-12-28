@@ -88,7 +88,7 @@ class QuestionListView(generics.ListCreateAPIView):
     Retrieves list of questions
     Allows logged in users to submit new questions
     """
-    queryset = Question.objects.all()
+    queryset = Question.objects.all().order_by('-created_at')
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
@@ -153,21 +153,24 @@ class QuestionAnswerList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         question = Question.objects.get(pk=self.kwargs['pk'])
-        return Answer.objects.filter(question=question)
+        return Answer.objects.filter(question=question).order_by('created_at')
 
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
         serializer.save(author=self.request.user, question=question)
-        if settings.DEBUG:
-            yag = Notify()
-            to = question.author.email
-            if to:
-                subject = "QuestionBox answer alert!"
-                content = self.request.user.username + " just gave an " \
-                    "answer to your question '" + question.title + "'" \
-                    "View your questions on your userprofile here " \
-                    "https://afternoon-fjord-67146.herokuapp.com/userprofile/"
+
+        yag = Notify()
+        to = question.author.email
+        if to:
+            subject = "QuestionBox answer alert!"
+            content = self.request.user.username + " just gave an " \
+                "answer to your question '" + question.title + "'" \
+                "View your questions on your userprofile here " \
+                "https://afternoon-fjord-67146.herokuapp.com/userprofile/"
+            try:
                 yag.sendemail(to, subject, content)
+            except Exception as e:
+                print(e)
 
 
 class QuestionStarList(generics.ListCreateAPIView):

@@ -56,8 +56,11 @@ function init() {
                     et = et.parentNode;
                 }
                 deleteQuestion(et);
-            } else if (et && et.matches('.answer-controls i')) {
+            } else if (et && et.matches('.answer-controls a[data-action="star"] *')) {
                 e.stopPropagation();
+                while (!et.matches('a[data-action="star"]')) {
+                    et = et.parentNode;
+                }
                 starAnswerHandler(et);
             } else if (et && et.matches('.question-controls a[data-action="star"] *')) {
                 e.stopPropagation();
@@ -147,7 +150,7 @@ function starItem(item, pk){
         method: 'POST',
         url: `api/${item}s/${pk}/stars/`
     }).done(function(response) {
-        
+        console.log(response);
         let star = document.querySelector(`a[data-action="star"][data-${item}='${response.object_id}']`);
         star.setAttribute('data-star', response.pk);
         toggleStar(star);
@@ -165,6 +168,7 @@ function unstarItem(pk){
         url: `api/stars/${pk}/`,
         dataType: 'text'
     }).done(function(response) {
+        console.log(response);
         let star = document.querySelector(`a[data-star='${pk}']`);
         star.removeAttribute('data-star');
         toggleStar(star);
@@ -244,10 +248,18 @@ function answerHTML(answer, resolved) {
                 <p>${answer.text_as_html}</p>
                 
                 <div class="answer-controls">
-                    ${answer.starred
-                        ? `<i class="fas fa-star fa-lg starred"aria-hidden="true" data-answer="${answer.id}" data-star="${answer.starred}"></i>`
-                        : `<i class="fas fa-star fa-lg unstarred"aria-hidden="true" data-answer="${answer.id}"></i>`
-                    }
+
+                ${answer.starred 
+                    ? `<a class="level-item" data-action="star" data-star="${answer.starred}" data-answer="${answer.id}" aria-label="like">
+                            <i class="fas fa-star fa-lg starred" aria-hidden="true">
+                                </i> <span>&nbsp; Unstar</span>
+                        </a>`
+                    : `<a class="level-item" data-action="star" data-answer="${answer.id}" aria-label="like">
+                            <i class="fas fa-star fa-lg unstarred" aria-hidden="true">
+                                </i> <span>&nbsp; Star</span>
+                        </a>`
+                        }
+
 
                     ${answer.author === questionAuthor && !resolved
                         ? `<div class="answer-controls">
@@ -434,7 +446,7 @@ function questionHTML(question){
             ${question.resolved
                 ? `<div class="response resolution">
                         <p>
-                            <small>${question.resolved.resolving_answer.author}</small> - <small>${question.resolved.resolving_answer.created_at}</small>
+                            <small>${question.resolved.resolving_answer.author}</small> - <small>${moment(question.resolved.resolving_answer.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                             <br>
                             <p>${question.resolved.resolving_answer.text}</p>
                         </p>
