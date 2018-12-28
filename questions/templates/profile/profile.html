@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load app_tags %}
+
+{% block title %}
+    Profile - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+<div class="tabs is-boxed is-centered main-menu" id="nav">
+  <ul>
+      <li data-target="pane-1" id="1">
+          <a>
+              <span class="icon is-small"><i class="fas fa-question"></i></span>
+              <span>My Questions</span>
+          </a>
+      </li>
+      <li data-target="pane-2" id="2">
+          <a>
+              <span class="icon is-small"><i class="fas fa-comment"></i></span>
+              <span>My Answers</span>
+          </a>
+      </li>
+      <li data-target="pane-3" id="3">
+          <a>
+              <span class="icon is-small"><i class="fas fa-star"></i></span>
+              <span>My Starred</span>
+          </a>
+      </li>
+  </ul>
+</div>
+
+<div class="has-text-centered">
+  <div class="tile is-parent">
+    <div class="tile is-child box">
+      <figure class="image container is-128x128">
+        <img class="is-rounded" src="{{ user|gravatar:50 }}" />
+      </figure><br>
+      <h1 class="title is-1 has-text-centered">@{{ user.username }}</h1>
+      <h3 class="subtitle is-4 has-text-centered">{{ user.email }}</h3>
+      <h2 class="subtitle">First Name: {{ user.first_name }}</h2>
+      <h2 class="subtitle">Last Name: {{ user.last_name }}</h2>
+      <a class="button is-warning" href="{% url 'edit_profile' %}">Edit Profile</a>
+      <a class="button is-info" href="{% url 'change_password' %}">Change Password</a>
+    </div>
+  </div>
+</div>
+{% endblock content %}

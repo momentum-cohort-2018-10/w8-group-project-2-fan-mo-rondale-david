@@ -44,6 +44,7 @@ class Question(Timestamp):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     stars = GenericRelation(StarredItem, related_query_name="question_stars")
+    starred = models.ManyToManyField(User, related_name='starred', blank=True)
 
     def __str__(self):
         return self.title

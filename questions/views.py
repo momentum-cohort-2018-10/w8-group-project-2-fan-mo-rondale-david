@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from questions.forms import EditProfileForm
 from django.views.generic.list import ListView
-from questions.models import Question
+from django.contrib.auth import update_session_auth_hash
+from questions.models import Question, Answer
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -41,7 +42,7 @@ class QuestionListView(ListView):
 
 @login_required
 def profile(request):
-    return render(request, 'registration/profile.html')
+    return render(request, 'profile/profile.html')
 
 
 def edit_profile(request):
@@ -54,7 +55,7 @@ def edit_profile(request):
     else:
         form = EditProfileForm(instance=request.user)
         args = {'form': form}
-        return render(request, 'registration/edit_profile.html', args)
+        return render(request, 'profile/edit_profile.html', args)
 
 
 def change_password(request):
@@ -63,6 +64,7 @@ def change_password(request):
 
         if form.is_valid():
             form.save()
+            update_session_auth_hash(request, form.user)
             return redirect('profile')
         else:
             return redirect('change_password')
@@ -71,4 +73,4 @@ def change_password(request):
         form = PasswordChangeForm(user=request.user)
 
         args = {'form': form}
-        return render(request, 'registration/change_password.html', args)
+        return render(request, 'profile/change_password.html', args)  

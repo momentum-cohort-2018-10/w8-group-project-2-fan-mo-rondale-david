@@ -1,4 +1,13 @@
 function init() {
+    let pane1 = document.querySelector("li[data-target='pane-1']");
+    if (pane1) {
+        pane1.addEventListener('click', getUserQuestions);
+    }
+    let pane2 = document.querySelector("li[data-target='pane-2']");
+    if (pane2) {
+        pane2.addEventListener('click', getUserAnswers);
+    }
+    
     let navBar = document.querySelector('.navbar-burger');
     if (navBar) {
         navBar.addEventListener('click', toggleNavBar);
@@ -111,6 +120,7 @@ function unstarItem(pk){
         toggleStar(star);
         
     });
+
 }
 
 function toggleStar(icon){
@@ -409,6 +419,8 @@ function addQuestionToList(question){
     
 }
 
+
+
 function startQuestions() {
     // click button to ask a question, opens modal with form
     document.getElementById('ask-question').addEventListener('click', toggleModal);
@@ -419,7 +431,66 @@ function startQuestions() {
 startQuestions()
 
 
+function getUserQuestions() {
+    console.log(this);
+    $.ajax({
+        method: 'GET', 
+        url: "/api/my-questions/"
+    }).done(function(response){
+        console.log(response);
+        document.querySelector('.tile.is-child.box').innerHTML = "";
+        addQuestionsToProfile(response)
+    }).fail(function(response){
+        console.log("There was an issue gettting the user's questions.");
+        console.log(response);
+    })
+}
 
+function addQuestionsToProfile(questions){
+    for (question of questions) {
+        document.querySelector('.tile.is-child.box').insertAdjacentHTML('afterbegin', questionHTML(question));
+    }
+}
+
+
+function getUserAnswers(){
+    $.ajax({
+        method: 'GET',
+        url: "/api/my-answers/"
+    }).done(function(response){
+        console.log(response);
+        document.querySelector('.tile.is-child.box').innerHTML = "";
+        addAnswersToProfile(response)
+    }).fail(function(response){
+        console.log("There was an issue gettting the user's answers.");
+        console.log(response);
+    })
+}
+
+
+function userAnswerHTML(answer) {
+    return`
+    <div class="box question">
+        <article class="media">
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <small>${answer.author}</small> - <small>${answer.created_at}</small>
+                        <br>
+                        ${answer.text}
+                    </p>
+                </div>
+            </div>
+        </article>
+    </div>
+    `
+}
+
+function addAnswersToProfile(answers){
+    for (answer of answers) {
+        document.querySelector('.tile.is-child.box').insertAdjacentHTML('afterbegin', userAnswerHTML(answer));
+    }
+}
 
 
 // Following code is for infinite scrolling feature
