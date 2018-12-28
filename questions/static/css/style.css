@@ -76,3 +76,6 @@ i.starred {
 .modal-content .field.is-grouped {
     margin-top: 20px;
 }
+.answer-controls a{
+    justify-content: left;
+}
