@@ -165,7 +165,7 @@ class QuestionAnswerList(generics.ListCreateAPIView):
             subject = "QuestionBox answer alert!"
             content = self.request.user.username + " just gave an " \
                 "answer to your question '" + question.title + "'" \
-                "View your questions on your userprofile here " \
+                " View your questions on your userprofile here " \
                 "https://afternoon-fjord-67146.herokuapp.com/userprofile/"
             try:
                 yag.sendemail(to, subject, content)
