@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_extensions',
     'debug_toolbar',
+    'markdownify',
 
     # DJANGO
     'django.contrib.admin',

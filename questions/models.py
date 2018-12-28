@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from django.core.mail import send_mail, EmailMultiAlternatives
 
+from markdownify.templatetags.markdownify import markdownify
 
 class User(AbstractUser):
 
@@ -43,6 +44,9 @@ class Question(Timestamp):
     def __str__(self):
         return self.title
 
+    def text_as_html(self):
+        return markdownify(self.text)
+
 
 class Answer(Timestamp):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -52,7 +56,12 @@ class Answer(Timestamp):
     stars = GenericRelation(StarredItem)
 
     def __str__(self):
+        # return self.author
         return f'{self.text[:20]}...'
+
+    def text_as_html(self):
+        return markdownify(self.text)
+        
 
 
 class Resolve(Timestamp):

@@ -16,6 +16,8 @@ django-heroku = "*"
 django-debug-toolbar = "*"
 yagmail = "*"
 keyring = "*"
+markdown = "*"
+django-markdownify = "*"
 
 [dev-packages]
 "flake8" = "*"
