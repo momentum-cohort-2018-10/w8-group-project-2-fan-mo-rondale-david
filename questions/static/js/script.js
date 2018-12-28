@@ -25,7 +25,6 @@ function init() {
         // create scene
         scene = new ScrollMagic.Scene({triggerElement: "#loader", triggerHook: "onEnter"})
                 .addTo(controller)
-                .addIndicators()
                 .on("enter", function (e) {
                     if (!$("#loader").hasClass("active")) {
                         $("#loader").addClass("active");
@@ -36,7 +35,7 @@ function init() {
 
                     }
                 })
-        loadTenQuestions();
+
         
 
         questionList.addEventListener('click', function(e) {
