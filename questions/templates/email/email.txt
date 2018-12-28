@@ -1,0 +1,8 @@
+Hello {{ question.author_name }},
+
+Your question has received an answer. If this answer satisfies your quest for knowledge,
+please log-in and mark it as resolved.
+
+Sincerely,
+Your Friends at QuestionBox
+

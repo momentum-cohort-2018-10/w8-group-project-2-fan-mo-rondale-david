@@ -5,14 +5,15 @@ from questions.forms import EditProfileForm
 from django.views.generic.list import ListView
 from questions.models import Question
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
 
 
 class QuestionListView(ListView):
     paginate_by = 10
     template_name = 'index.html'
     queryset = Question.objects.all()
-    
-
 
 
 @login_required

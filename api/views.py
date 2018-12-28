@@ -1,40 +1,33 @@
 from api.serializers import (
-    UserSerializer,
-    StarredItemSerializer,
-    QuestionSerializer,
-    AnswerSerializer,
-    ResolveSerializer,
-    DetailedAnswerResolveSerializer
-)
+    UserSerializer, StarredItemSerializer, QuestionSerializer,
+    AnswerSerializer, ResolveSerializer, DetailedAnswerResolveSerializer)
 from questions.models import User, StarredItem, Question, Answer, Resolve
 from rest_framework import generics
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from api.permissions import (
-    IsAuthorOrReadOnly,
-    IsStarOwnerOrReadOnly,
-    IsAnswerOwnerOrReadOnly,
-    OnlyAuthorCanMarkResolved
-)
-from rest_framework.permissions import (
-    IsAuthenticatedOrReadOnly,
-    IsAuthenticated
-)
+from api.permissions import (IsAuthorOrReadOnly, IsStarOwnerOrReadOnly,
+                             IsAnswerOwnerOrReadOnly,
+                             OnlyAuthorCanMarkResolved)
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly,
+                                        IsAuthenticated)
 from django.contrib.contenttypes.models import ContentType
+from questions.notify import Notify
 
 
-@api_view(['GET',])
+@api_view([
+    'GET',
+])
 def api_root(request, format=None):
     return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'questions': reverse('question-list', request=request, format=format),
-        'my-questions': reverse('user-question-list',
-                                request=request,
-                                format=format),
-        'my-answers': reverse('user-answer-list',
-                              request=request,
-                              format=format)
+        'users':
+        reverse('user-list', request=request, format=format),
+        'questions':
+        reverse('question-list', request=request, format=format),
+        'my-questions':
+        reverse('user-question-list', request=request, format=format),
+        'my-answers':
+        reverse('user-answer-list', request=request, format=format)
     })
 
 
@@ -59,7 +52,7 @@ class UserQuestionListView(generics.ListAPIView):
     Retrieves author's list of questions
     """
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         user = self.request.user
@@ -71,7 +64,7 @@ class UserAnswerListView(generics.ListAPIView):
     Retrieves author's list of answers
     """
     serializer_class = AnswerSerializer
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         user = self.request.user
@@ -96,7 +89,7 @@ class QuestionListView(generics.ListCreateAPIView):
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -109,7 +102,10 @@ class QuestionDetailView(generics.RetrieveDestroyAPIView):
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly,)
+    permission_classes = (
+        IsAuthenticatedOrReadOnly,
+        IsAuthorOrReadOnly,
+    )
 
 
 class QuestionsByUserListView(generics.ListAPIView):
@@ -152,7 +148,7 @@ class QuestionAnswerList(generics.ListCreateAPIView):
     Allows logged in users to post an answer
     """
     serializer_class = AnswerSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         question = Question.objects.get(pk=self.kwargs['pk'])
@@ -161,6 +157,15 @@ class QuestionAnswerList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
         serializer.save(author=self.request.user, question=question)
+        yag = Notify()
+        to = question.author.email
+        if to:
+            subject = "QuestionBox answer alert!"
+            content = self.request.user.username + " just gave an " \
+                "answer to your question '" + question.title + "'" \
+                "View your questions on your userprofile here " \
+                "https://afternoon-fjord-67146.herokuapp.com/userprofile/"
+            yag.sendemail(to, subject, content)
 
 
 class QuestionStarList(generics.ListCreateAPIView):
@@ -169,12 +174,12 @@ class QuestionStarList(generics.ListCreateAPIView):
     Allows logged in users to add a star
     """
     serializer_class = StarredItemSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         content_type = ContentType.objects.get(model='question')
-        return StarredItem.objects.filter(object_id=self.kwargs['pk'],
-                                          content_type=content_type)
+        return StarredItem.objects.filter(
+            object_id=self.kwargs['pk'], content_type=content_type)
 
     def perform_create(self, serializer):
         question = Question.objects.get(pk=self.kwargs['pk'])
@@ -210,12 +215,14 @@ class AnswerStarList(generics.ListCreateAPIView):
     Allows logged in users to star an answer
     """
     serializer_class = StarredItemSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, )
 
     def get_queryset(self):
         content_type = ContentType.objects.get(model='answer')
-        return StarredItem.objects.filter(object_id=self.kwargs['pk'],
-                                          content_type=content_type)
+        return StarredItem.objects.filter(
+            object_id=self.kwargs['pk'], content_type=content_type)
+        return StarredItem.objects.filter(
+            object_id=self.kwargs['pk'], content_type=content_type)
 
     def perform_create(self, serializer):
         answer = Answer.objects.get(pk=self.kwargs['pk'])
