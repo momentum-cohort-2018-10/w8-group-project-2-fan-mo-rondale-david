@@ -436,7 +436,7 @@ function questionHTML(question){
             ${question.resolved
                 ? `<div class="response resolution">
                         <p>
-                            <small>${question.resolved.resolving_answer.author}</small> - <small>${question.resolved.resolving_answer.created_at}</small>
+                            <small>${question.resolved.resolving_answer.author}</small> - <small>${moment(question.resolved.resolving_answer.created_at).format("MMM. D, YYYY, hh:mm a")}</small>
                             <br>
                             <p>${question.resolved.resolving_answer.text}</p>
                         </p>
