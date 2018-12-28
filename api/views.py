@@ -88,7 +88,7 @@ class QuestionListView(generics.ListCreateAPIView):
     Retrieves list of questions
     Allows logged in users to submit new questions
     """
-    queryset = Question.objects.all()
+    queryset = Question.objects.all().order_by('-created_at')
     serializer_class = QuestionSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
 
