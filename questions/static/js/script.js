@@ -42,8 +42,10 @@ function init() {
         questionList.addEventListener('click', function(e) {
             let et = e.target;
             
-            
-            if (et && et.matches('.answer-controls i')) {
+            if (et && et.matches('a[data-action="delete"]')) {
+                e.stopPropagation();
+                deleteQuestion(et);
+            } else if (et && et.matches('.answer-controls i')) {
                 e.stopPropagation();
                 starAnswerHandler(et);
             } else if (et && et.matches('.question-controls i')) {
@@ -65,7 +67,7 @@ function init() {
                 
                 loadAnswers(et);
             }
-        })
+        });
     }
     
     // document.getElementsByClassName('delete-button').addEventListener('click', console.log('delete?'))
@@ -90,13 +92,17 @@ function toggleModal(){
     modal.classList.toggle('is-active');
 }
 
-function deleteQuestion(pk) {
-    console.log((pk))
-        $.ajax({
-            method: 'DELETE',
-            url: `/api/questions/${pk}`
-        })
-    }
+function deleteQuestion(et) {
+    let pk = et.getAttribute('data-question');
+
+    $.ajax({
+        method: 'DELETE',
+        url: `/api/questions/${pk}/`
+    }).done(function(){
+        let questionBlock = document.querySelector(`.box.question[data-question="${pk}"]`);
+        questionBlock.remove();
+    });
+}
 
 
 //STARRING ITEMS
@@ -372,14 +378,23 @@ function questionHTML(question){
                 <nav class="level is-mobile">
                     <div class="level-left question-controls">
                         <a class="level-item" aria-label="like">
-                            <span class="icon is-medium">
-                                ${question.starred 
-                                    ? `<i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="${question.id}" data-star="${question.starred}"></i>`
-                                    : `<i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}"></i>`
-                                }
+                            
+                            ${question.starred 
+                                ? `<i class="fas fa-star fa-lg starred" aria-hidden="true" data-question="${question.id}" data-star="${question.starred}">
+                                    </i> &nbsp; Unstar`
+                                : `<i class="fas fa-star fa-lg unstarred" aria-hidden="true" data-question="${question.id}">
+                                    </i> &nbsp; Star`
+                            }
                                 
-                            </span>
+                            
                         </a>
+                        ${question.users_question
+                            ? `<a class="level-item" data-action="delete" data-question="${question.id}" aria-label="delete">
+                                    <i class="fas fa-trash">
+                                    </i> &nbsp; Delete 
+                                </a>`
+                            : ''}
+                        
                         <div>
                             <p><strong>${question.answer_count} ${humanizeAnswers(question.answer_count)}</strong></p>
                         </div>

@@ -146,6 +146,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                                           read_only=True)
     starred = serializers.SerializerMethodField()
     resolved = DetailedAnswerResolveSerializer(read_only=True)
+    users_question = serializers.SerializerMethodField()
 
     question_resolution_link = serializers.HyperlinkedIdentityField(
         view_name='question-resolution'
@@ -170,6 +171,7 @@ class QuestionSerializer(serializers.ModelSerializer):
                     'text',
                     'starred',
                     'resolved',
+                    'users_question',
                     'answer_count',
                     'star_count',
                     'question_detail_link',
@@ -192,3 +194,9 @@ class QuestionSerializer(serializers.ModelSerializer):
                 return user_star[0].pk
 
         return 0
+
+    def get_users_question(self, obj):
+        question = Question.objects.get(pk=obj.pk)
+        user = self.context.get('request').parser_context['request'].user
+
+        return question.author == user
